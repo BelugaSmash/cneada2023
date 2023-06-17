@@ -20,7 +20,9 @@ floor_h = 200
 player_w, player_h = 55, 55
 player_y = screen_h - floor_h - player_h
 opy = player_y
-gravity = 0
+gravity = 0 
+sliding = False
+jumping = False
 
 # FPS 설정을 위한 변수
 clock = pygame.time.Clock()
@@ -32,19 +34,30 @@ while 1:
         if event.type == pygame.QUIT:
             sys.exit()
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
-                if opy == player_y:
+            if opy == player_y:
+                if event.key == pygame.K_UP:
                     gravity = 30
+                    jumping = True
+                elif event.key == pygame.K_DOWN:
+                    sliding = True
+        if event.type == pygame.KEYUP: 
+            if event.key == pygame.K_DOWN:
+                sliding = False
+
 
     player_y -= gravity
     if player_y >= opy:
         player_y = opy
+        jumping = False
     gravity -= 2
     
     screen.fill((50, 150, 200))
+    # 바닥 그리기
     pygame.draw.rect(screen, (100, 70, 70), [0, screen_h - floor_h, screen_w, floor_h])
     pygame.draw.rect(screen, (0, 200, 0), [0, screen_h - floor_h, screen_w, 30])
-    pygame.draw.rect(screen, (0, 0, 255), [100, player_y, player_w, player_h])
+    # 플레이어 그리기
+    pygame.draw.rect(screen, (0, 0, 255), [100, player_y + (player_h / 2 if sliding and not jumping else 0), player_w, player_h / (2 if sliding and not jumping  else 1)])
+
     pygame.display.update()
 
 # 2초 기다리고 게임을 끈다.
