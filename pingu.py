@@ -37,7 +37,7 @@ while 1:
         if event.type == pygame.KEYDOWN:
             if jumpCnt > 0:
                 if event.key == pygame.K_UP or event.key == pygame.K_SPACE:
-                    gravity = 25
+                    gravity = 20
                     jumping = True
                     jumpCnt -= 1
             if event.key == pygame.K_DOWN:
@@ -52,7 +52,7 @@ while 1:
         player_y = opy
         jumping = False
         jumpCnt = 2
-    gravity -= 2
+    gravity -= 1.2
     
     screen.fill((50, 150, 200))
     # 바닥 그리기
