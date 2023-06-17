@@ -9,11 +9,14 @@ pygame.init()
 pygame.display.set_caption("Pingu's Adventure")
 
 # 파이게임 화면 크기 설정
-screen = pygame.display.set_mode((1280, 720))
+screen_w, screen_h = 1280, 720
+screen = pygame.display.set_mode((screen_w, screen_h))
 
 # 변수들 초기화
 cpath = os.path.dirname(__file__)
 #player_img = pygame.image.load("resources/pingu2.png")
+
+floor_height = 200
 
 # FPS 설정을 위한 변수
 clock = pygame.time.Clock()
@@ -24,6 +27,11 @@ while 1:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
+    
+    screen.fill((50, 150, 200))
+    pygame.draw.rect(screen, (100, 70, 70), [0, screen_h - floor_height, screen_w, floor_height])
+    pygame.draw.rect(screen, (0, 200, 0), [0, screen_h - floor_height, screen_w, 30])
+    pygame.display.update()
 
 # 2초 기다리고 게임을 끈다.
 pygame.time.delay(2000)
