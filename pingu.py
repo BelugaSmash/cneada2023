@@ -35,11 +35,11 @@ while 1:
             sys.exit()
         if event.type == pygame.KEYDOWN:
             if opy == player_y:
-                if event.key == pygame.K_UP:
+                if event.key == pygame.K_UP or event.key == pygame.K_SPACE:
                     gravity = 30
                     jumping = True
-                elif event.key == pygame.K_DOWN:
-                    sliding = True
+            if event.key == pygame.K_DOWN:
+                sliding = True
         if event.type == pygame.KEYUP: 
             if event.key == pygame.K_DOWN:
                 sliding = False
