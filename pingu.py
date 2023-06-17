@@ -20,6 +20,7 @@ floor_h = 200
 player_w, player_h = 55, 55
 player_y = screen_h - floor_h - player_h
 opy = player_y
+gravity = 0
 
 # FPS 설정을 위한 변수
 clock = pygame.time.Clock()
@@ -30,6 +31,15 @@ while 1:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                if opy == player_y:
+                    gravity = 30
+
+    player_y -= gravity
+    if player_y >= opy:
+        player_y = opy
+    gravity -= 2
     
     screen.fill((50, 150, 200))
     pygame.draw.rect(screen, (100, 70, 70), [0, screen_h - floor_h, screen_w, floor_h])
