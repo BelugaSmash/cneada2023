@@ -28,7 +28,8 @@ jump_cnt = 2
 
 # bgm 설정
 bgm = pygame.mixer.Sound("resource/it's just burning memory.wav")
-bgm.play()
+bgm.set_volume(0.5)
+bgm.play(-1)
 
 # 장애물 변수 선언
 obs_x = [screen_w, screen_w * 3 / 2]
@@ -55,7 +56,7 @@ def game_restart():
     obs_x = [screen_w, screen_w * 3 / 2]
     obs_t = [random.randint(1, 2), random.randint(1, 2)]
     game_over = False
-    bgm.play()
+    bgm.play(-1)
 
 while 1:
     # FPS를 60으로 설정
