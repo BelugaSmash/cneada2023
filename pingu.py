@@ -50,13 +50,13 @@ def game_restart():
     global player_y, gravity, sliding, jumping, jump_cnt, obs_x, obs_t, game_over 
     player_y = opy
     gravity = 0 
-    sliding = False 
+    sliding = False
     jumping = False
     jump_cnt = 2
     obs_x = [screen_w, screen_w * 3 / 2]
-    obs_t = [random.randint(1, 2), random.randint(1, 2)]
+    obs_t = [random.randint(1, 3), random.randint(1, 3)]
     game_over = False
-    bgm.play(-1)
+    bgm.play()
 
 while 1:
     # FPS를 60으로 설정
@@ -96,7 +96,7 @@ while 1:
             obs_x[i] -= obs_speed
             if obs_x[i] + obs_w <= 0:
                 px = obs_x[abs(1 - i)] + screen_w / 2 + random.randint(0, 700)
-                obs_t[i] = random.randint(1, 2)
+                obs_t[i] = random.randint(1, 3)
                 obs_x[i] += px
     
     screen.fill((50, 150, 200))
@@ -108,7 +108,11 @@ while 1:
     pygame.draw.rect(screen, (0, 0, 255), player_rect)
     # 장애물 그리기
     for i in range(2):
-        obs_rect = [obs_x[i], screen_h - floor_h - obs_h * obs_t[i], obs_w, obs_h * obs_t[i]]
+        obs_rect = []
+        if obs_t[i] == 3:
+            obs_rect =  [obs_x[i], screen_h - floor_h - player_h * 3 / 5 - obs_h, obs_w, obs_h]
+        else:
+            obs_rect = [obs_x[i], screen_h - floor_h - obs_h * obs_t[i], obs_w, obs_h * obs_t[i]]
         pygame.draw.rect(screen, (255, 0, 0), obs_rect)
         if collide(*player_rect, *obs_rect) and not game_over:
             bgm.stop()
