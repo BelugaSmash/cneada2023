@@ -23,6 +23,7 @@ opy = player_y
 gravity = 0 
 sliding = False
 jumping = False
+jumpCnt = 2
 
 # FPS 설정을 위한 변수
 clock = pygame.time.Clock()
@@ -34,10 +35,11 @@ while 1:
         if event.type == pygame.QUIT:
             sys.exit()
         if event.type == pygame.KEYDOWN:
-            if opy == player_y:
+            if jumpCnt > 0:
                 if event.key == pygame.K_UP or event.key == pygame.K_SPACE:
-                    gravity = 30
+                    gravity = 25
                     jumping = True
+                    jumpCnt -= 1
             if event.key == pygame.K_DOWN:
                 sliding = True
         if event.type == pygame.KEYUP: 
@@ -49,6 +51,7 @@ while 1:
     if player_y >= opy:
         player_y = opy
         jumping = False
+        jumpCnt = 2
     gravity -= 2
     
     screen.fill((50, 150, 200))
