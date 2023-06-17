@@ -110,7 +110,6 @@ while 1:
     for i in range(2):
         obs_rect = []
         if obs_t[i] == 3:
-            print(3)
             obs_rect =  [obs_x[i], screen_h - floor_h - player_h * 4 / 5 - obs_h * obs_t[i], obs_w, obs_h * obs_t[i]]
         else:
             obs_rect = [obs_x[i], screen_h - floor_h - obs_h * obs_t[i], obs_w, obs_h * obs_t[i]]
