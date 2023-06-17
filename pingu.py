@@ -26,8 +26,10 @@ sliding = False
 jumping = False
 jump_cnt = 2
 
-# bgm 설정
+# 소리 관련 변수 설정
 bgm = pygame.mixer.Sound("resource/it's just burning memory.wav")
+jump_sound = pygame.mixer.Sound("resource/juuuuuump.wav")
+jump_sound.set_volume(0.35)
 bgm.set_volume(0.5)
 bgm.play(-1)
 
@@ -74,6 +76,7 @@ while 1:
                         gravity = 20
                         jumping = True
                         jump_cnt -= 1
+                        jump_sound.play()
                 if event.key == pygame.K_DOWN:
                     sliding = True
         if event.type == pygame.KEYUP:
