@@ -26,6 +26,10 @@ sliding = False
 jumping = False
 jump_cnt = 2
 
+# bgm 설정
+bgm = pygame.mixer.Sound("resource/it's just burning memory.wav")
+bgm.play()
+
 # 장애물 변수 선언
 obs_x = [screen_w, screen_w * 3 / 2]
 obs_t = [random.randint(1, 2), random.randint(1, 2)]
@@ -51,6 +55,7 @@ def game_restart():
     obs_x = [screen_w, screen_w * 3 / 2]
     obs_t = [random.randint(1, 2), random.randint(1, 2)]
     game_over = False
+    bgm.play()
 
 while 1:
     # FPS를 60으로 설정
@@ -83,6 +88,7 @@ while 1:
             jumping = False
             jump_cnt = 2
         gravity -= 1.2
+        
     
         # 장애물 움직이기
         for i in range(2): 
@@ -103,7 +109,8 @@ while 1:
     for i in range(2):
         obs_rect = [obs_x[i], screen_h - floor_h - obs_h * obs_t[i], obs_w, obs_h * obs_t[i]]
         pygame.draw.rect(screen, (255, 0, 0), obs_rect)
-        if collide(*player_rect, *obs_rect):
+        if collide(*player_rect, *obs_rect) and not game_over:
+            bgm.stop()
             game_over = True
     pygame.display.update()
 
