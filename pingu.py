@@ -33,7 +33,7 @@ bgm.play(-1)
 
 # 장애물 변수 선언
 obs_x = [screen_w, screen_w * 3 / 2]
-obs_t = [random.randint(1, 2), random.randint(1, 2)]
+obs_t = [random.randint(1, 3), random.randint(1, 3)]
 obs_w, obs_h = 55, 80
 obs_speed = 8
 
@@ -110,7 +110,8 @@ while 1:
     for i in range(2):
         obs_rect = []
         if obs_t[i] == 3:
-            obs_rect =  [obs_x[i], screen_h - floor_h - player_h * 3 / 5 - obs_h, obs_w, obs_h]
+            print(3)
+            obs_rect =  [obs_x[i], screen_h - floor_h - player_h * 4 / 5 - obs_h * obs_t[i], obs_w, obs_h * obs_t[i]]
         else:
             obs_rect = [obs_x[i], screen_h - floor_h - obs_h * obs_t[i], obs_w, obs_h * obs_t[i]]
         pygame.draw.rect(screen, (255, 0, 0), obs_rect)
