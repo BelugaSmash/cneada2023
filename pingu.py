@@ -6,7 +6,7 @@ import os
 pygame.init()
 
 # 창 제목 설정
-pygame.display.set_caption("Pingu's Adventure")
+pygame.display.set_caption("Pingu's Adventure II")
 
 # 파이게임 화면 크기 설정
 screen_w, screen_h = 1280, 720
