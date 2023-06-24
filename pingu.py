@@ -15,7 +15,7 @@ screen = pygame.display.set_mode((screen_w, screen_h))
 
 # 변수들 초기화
 cpath = os.path.dirname(__file__)
-#player_img = pygame.image.load("resources/pingu2.png")
+# player_img = [pygame.image.load(f"resources/pingu/p{i}.png") for i in range(1)]
 
 floor_h = 200
 player_w, player_h = 55, 55
