@@ -53,7 +53,8 @@ jump_sound = pygame.mixer.Sound("resource/juuuuuump.wav")
 boom_sound = pygame.mixer.Sound("resource/boom.wav")
 m_boss_bgm = pygame.mixer.Sound("resource/m_boss.mp3")
 jump_sound.set_volume(0.35)
-bgm.set_volume(0.5)
+bgm.set_volume(1)
+m_boss_bgm.set_volume(0.7)
 bgm.play(-1)
 
 # 장애물 변수 선언
