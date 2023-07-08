@@ -22,6 +22,7 @@ boss_img = pygame.image.load("resource/boss.png")
 boss_attack_img = pygame.image.load("resource/boss_attack.png")
 obs_img = [0, pygame.image.load("resource/obstacle1.png"), pygame.image.load("resource/obstacle2.png"), None]
 laser_img = pygame.image.load("resource/laser.png")
+bg_img = pygame.image.load("resource/bg.png")
 
 floor_h = 200
 
@@ -190,9 +191,10 @@ while 1:
 
     # 화면 채우기
     bg_color = (50, 150, 200)
-    if mode == "m boss":
-        bg_color = (200, 50, 50)
-    screen.fill(bg_color)
+    if mode == "normal" or mode == "m boss appear":
+        screen.fill(bg_color)
+    elif mode == "m boss":
+        screen.blit(bg_img, (0,0))
     if hand_up:
         # 중간 보스 그리기
         screen.blit(boss_hand[0], (boss_hand_x[0] + sc_shake_x, hand_y + sc_shake_y))
