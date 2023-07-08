@@ -41,6 +41,10 @@ obs_t = [random.randint(1, 3), random.randint(1, 3)]
 obs_w, obs_h = 55, 80
 obs_speed = [8,8]
 
+# 스테이지 관련 변수 선언
+score = 0
+font1 = pygame.font.SysFont('Sans', 30)
+
 game_over = False
 
 # FPS 설정을 위한 변수
@@ -51,12 +55,13 @@ def collide(x, y, w, h, x_, y_, w_, h_):
     return x < x_ + w_ and y < y_ + h_ and x + w > x_ and y + h > y_
 
 def game_restart(): 
-    global player_y, gravity, sliding, jumping, jump_cnt, obs_x, obs_t, game_over 
+    global player_y, gravity, sliding, jumping, jump_cnt, obs_x, obs_t, game_over, score
     player_y = opy
     gravity = 0 
     sliding = False
     jumping = False
     jump_cnt = 2
+    score = 0
     obs_x = [screen_w, screen_w * 3 / 2]
     obs_t = [random.randint(1, 3), random.randint(1, 3)]
     game_over = False
@@ -103,12 +108,14 @@ while 1:
                 px = screen_w + random.randint(0, 200)
                 obs_t[i] = random.randint(1, 3)
                 obs_x[i] += px
+                score += 1
                 #obs_speed[i] = random.randint(5,20)
         player_anim_frame += 1
         if player_anim_frame == 3:
             player_anim += 1
             player_anim_frame = 0
     
+    # 화면 채우기
     screen.fill((50, 150, 200))
     # 바닥 그리기
     pygame.draw.rect(screen, (100, 70, 70), [0, screen_h - floor_h, screen_w, floor_h])
@@ -128,6 +135,11 @@ while 1:
         if collide(*player_rect, *obs_rect) and not game_over:
             bgm.stop()
             game_over = True
+    
+    score_color = (0, 0, 0)
+    scoretxt = font1.render('Score: ' + str(score), True, score_color)
+    screen.blit(scoretxt, (10, 10))
+
     pygame.display.update()
 
 # 2초 기다리고 게임을 끈다.
