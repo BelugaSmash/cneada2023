@@ -22,6 +22,10 @@ boss_img = pygame.image.load("resource/boss.png")
 
 floor_h = 200
 
+# 화면 흔들림 구현 위해
+sc_shake_x, sc_shake_y = 0, 0
+shake_frame = 0
+
 #플레이어 관련 변수 선언
 player_w, player_h = 55, 55
 player_y = screen_h - floor_h - player_h
@@ -42,6 +46,7 @@ hand_up = True
 # 소리 관련 변수 설정
 bgm = pygame.mixer.Sound("resource/it's just burning memory.wav")
 jump_sound = pygame.mixer.Sound("resource/juuuuuump.wav")
+boom_sound = pygame.mixer.Sound("resource/boom.wav")
 jump_sound.set_volume(0.35)
 bgm.set_volume(0.5)
 bgm.play(-1)
@@ -69,7 +74,7 @@ def collide(x, y, w, h, x_, y_, w_, h_):
     return x < x_ + w_ and y < y_ + h_ and x + w > x_ and y + h > y_
 
 def game_restart():
-    global player_y, gravity, sliding, jumping, jump_cnt, obs_x, obs_t, game_over, score, mode, hand_up, obs_y
+    global player_y, gravity, sliding, jumping, jump_cnt, obs_x, obs_t, game_over, score, mode, hand_up, obs_y, sc_shake_x, sc_shake_y, shake_frame
     player_y = opy
     gravity = 0 
     sliding = False
@@ -78,6 +83,8 @@ def game_restart():
     obs_y = 0
     jump_cnt = 2
     score = 0
+    sc_shake_x = sc_shake_y = 0
+    shake_frame = 0
     mode = "normal"
     obs_x = [screen_w, screen_w * 4 / 3 + random.randint(0, 200), screen_w * 5 / 3 + random.randint(200, 400)]
     obs_t = [random.randint(1, 3), random.randint(1, 3), random.randint(1, 3)]
@@ -129,6 +136,7 @@ while 1:
                     score += 1
                     if score == m_boss_score:
                         mode = "m boss appear"
+                        bgm.stop()
                 #obs_speed[i] = random.randint(5,20)
         player_anim_frame += 1
         if player_anim_frame == 3:
@@ -143,12 +151,23 @@ while 1:
                     hand_up = False
             else:
                 hand_y += 20
-                if hand_y >= screen_h - floor_h - 24:
+                if hand_y >= screen_h - floor_h - 14:
+                    hand_y = screen_h - floor_h - 14
                     mode = "m boss"
+                    shake_frame = 30
+                    boom_sound.play()
     if not hand_up:
         obs_y -= 50
         if boss_y >= screen_h - floor_h - 100:
             boss_y -= 10
+    
+    if shake_frame > 0:
+        shake_frame -= 1
+        sc_shake_x = random.randint(-50, 50)
+        sc_shake_y = random.randint(-50, 50)
+    else:
+        sc_shake_x = sc_shake_y = 0
+
     # 화면 채우기
     bg_color = (50, 150, 200)
     if mode == "m boss":
@@ -156,18 +175,18 @@ while 1:
     screen.fill(bg_color)
     if hand_up:
         # 중간 보스 그리기
-        screen.blit(boss_hand[0], (boss_hand_x[0], hand_y))
-        screen.blit(boss_hand[1], (boss_hand_x[1], hand_y))
-    screen.blit(boss_img, (boss_x, boss_y))
+        screen.blit(boss_hand[0], (boss_hand_x[0] + sc_shake_x, hand_y + sc_shake_y))
+        screen.blit(boss_hand[1], (boss_hand_x[1] + sc_shake_x, hand_y + sc_shake_y))
+    screen.blit(boss_img, (boss_x + sc_shake_x, boss_y + sc_shake_y))
     # 바닥 그리기
-    pygame.draw.rect(screen, (100, 70, 70), [0, screen_h - floor_h, screen_w, floor_h])
-    pygame.draw.rect(screen, (0, 200, 0), [0, screen_h - floor_h, screen_w, 30])
+    pygame.draw.rect(screen, (100, 70, 70), [0 + sc_shake_x, screen_h - floor_h + sc_shake_y, screen_w, floor_h])
+    pygame.draw.rect(screen, (0, 200, 0), [0 + sc_shake_x, screen_h - floor_h + sc_shake_y, screen_w, 30])
     if not hand_up:
         # 중간 보스 그리기
-        screen.blit(boss_hand[0], (boss_hand_x[0], hand_y))
-        screen.blit(boss_hand[1], (boss_hand_x[1], hand_y))
+        screen.blit(boss_hand[0], (boss_hand_x[0] + sc_shake_x, hand_y + sc_shake_y))
+        screen.blit(boss_hand[1], (boss_hand_x[1] + sc_shake_x, hand_y + sc_shake_y))
     # 플레이어 그리기
-    player_rect = [100, player_y + (player_h / 2 if sliding and not jumping else 0), player_w, player_h / (2 if sliding and not jumping  else 1)]
+    player_rect = [100 + sc_shake_x, player_y + (player_h / 2 if sliding and not jumping else 0) + sc_shake_y, player_w, player_h / (2 if sliding and not jumping  else 1)]
     if jumping or not sliding:
         screen.blit(player_walk_img[player_anim % 28], player_rect)
     else:
@@ -177,11 +196,11 @@ while 1:
     for i in range(3):
         obs_rect = []
         if obs_t[i] == 3:
-            obs_rect =  [obs_x[i], screen_h - floor_h - player_h * 4 / 5 - obs_h * obs_t[i] + obs_y, obs_w, obs_h * obs_t[i]]
+            obs_rect =  [obs_x[i] + sc_shake_x, screen_h - floor_h - player_h * 4 / 5 - obs_h * obs_t[i] + obs_y + sc_shake_y, obs_w, obs_h * obs_t[i]]
         else:
-            obs_rect = [obs_x[i], screen_h - floor_h - obs_h * obs_t[i] + obs_y, obs_w, obs_h * obs_t[i]]
+            obs_rect = [obs_x[i] + sc_shake_x, screen_h - floor_h - obs_h * obs_t[i] + obs_y + sc_shake_y, obs_w, obs_h * obs_t[i]]
         pygame.draw.rect(screen, (255, 0, 0), obs_rect)
-        if collide(*player_rect, *obs_rect) and not game_over and mode == "normal":
+        if collide(*player_rect, *obs_rect) and not game_over and (mode == "normal" or mode == "m boss appear"):
             bgm.stop()
             game_over = True
     
