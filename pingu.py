@@ -38,7 +38,7 @@ jumping = False
 jump_cnt = 2
 
 # 보스 관련 변수 선언
-boss_hand_x = [850, 960]
+boss_hand_x = [830, 1000]
 hand_y = screen_h - floor_h - 34 + 300
 boss_x, boss_y = 810, screen_h - floor_h
 hand_up = True
@@ -158,7 +158,7 @@ while 1:
                     boom_sound.play()
     if not hand_up:
         obs_y -= 50
-        if boss_y >= screen_h - floor_h - 350:
+        if boss_y >= screen_h - floor_h - 300:
             boss_y -= 3
     
     if shake_frame > 0:
