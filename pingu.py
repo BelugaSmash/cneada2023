@@ -19,7 +19,9 @@ player_walk_img = [pygame.image.load(f"resource/pingu_walk/pingu_{str(i).zfill(2
 player_slide_img = pygame.image.load("resource/pingu_slide.png")
 boss_hand = [pygame.image.load("resource/boss_hand_left.png"), pygame.image.load("resource/boss_hand_right.png")]
 boss_img = pygame.image.load("resource/boss.png")
-obs_img = [0, pygame.image.load("resource/obstacle1.png"), None, None]
+boss_attack_img = pygame.image.load("resource/boss_attack.png")
+obs_img = [0, pygame.image.load("resource/obstacle1.png"), pygame.image.load("resource/obstacle2.png"), None]
+laser_img = pygame.image.load("resource/laser.png")
 
 floor_h = 200
 
@@ -62,6 +64,8 @@ obs_speed = [8,8,8]
 # 스테이지 관련 변수 선언
 score = 0
 m_boss_score = 5
+boss_turn = 100
+boss_attack = 0
 mode = "normal"
 font1 = pygame.font.SysFont('Sans', 30)
 
@@ -75,7 +79,7 @@ def collide(x, y, w, h, x_, y_, w_, h_):
     return x < x_ + w_ and y < y_ + h_ and x + w > x_ and y + h > y_
 
 def game_restart():
-    global player_y, gravity, sliding, jumping, jump_cnt, obs_x, obs_t, game_over, score, mode, hand_up, obs_y, sc_shake_x, sc_shake_y, shake_frame
+    global player_y, gravity, sliding, jumping, jump_cnt, obs_x, obs_t, game_over, score, mode, hand_up, obs_y, sc_shake_x, sc_shake_y, shake_frame, hand_y, boss_y, boss_x
     player_y = opy
     gravity = 0 
     sliding = False
@@ -84,6 +88,8 @@ def game_restart():
     obs_y = 0
     jump_cnt = 2
     score = 0
+    hand_y = screen_h - floor_h - 34 + 300
+    boss_x, boss_y = 810, screen_h - floor_h
     sc_shake_x = sc_shake_y = 0
     shake_frame = 0
     mode = "normal"
@@ -161,6 +167,19 @@ while 1:
         obs_y -= 50
         if boss_y >= screen_h - floor_h - 300:
             boss_y -= 3
+
+    if mode == "m boss":
+        boss_turn -= 1
+        if boss_turn == 0:
+            boss_turn = 60 * 6
+            boss_attack = 1
+
+    if boss_attack == 1:
+        boss_x -= 20
+        if boss_x == 810:
+            boss_attack = 0
+        if boss_x <= -309:
+            boss_x += screen_w + 200
     
     if shake_frame > 0:
         shake_frame -= 1
@@ -178,7 +197,12 @@ while 1:
         # 중간 보스 그리기
         screen.blit(boss_hand[0], (boss_hand_x[0] + sc_shake_x, hand_y + sc_shake_y))
         screen.blit(boss_hand[1], (boss_hand_x[1] + sc_shake_x, hand_y + sc_shake_y))
-    screen.blit(boss_img, (boss_x + sc_shake_x, boss_y + sc_shake_y))
+    boss_rect = [boss_x + sc_shake_x, boss_y + sc_shake_y, 309, 800]
+    if boss_attack == 0:
+        screen.blit(boss_img, boss_rect)
+    elif boss_attack == 1 or boss_attack == 2:
+        screen.blit(boss_attack_img, boss_rect)
+    #screen.blit(laser_img, (0, 0))
     # 바닥 그리기
     pygame.draw.rect(screen, (100, 70, 70), [0 + sc_shake_x, screen_h - floor_h + sc_shake_y, screen_w, floor_h * 2])
     pygame.draw.rect(screen, (0, 200, 0), [0 + sc_shake_x, screen_h - floor_h + sc_shake_y, screen_w, 30])
@@ -193,6 +217,9 @@ while 1:
     else:
         screen.blit(player_slide_img, player_rect)
     # pygame.draw.rect(screen, (0, 0, 255), player_rect)
+    if collide(*player_rect, *boss_rect) and not game_over:
+        bgm.stop()
+        game_over = True
     # 장애물 그리기
     for i in range(3):
         obs_rect = []
@@ -204,7 +231,7 @@ while 1:
             pygame.draw.rect(screen, (255, 0, 0), obs_rect)
         else:
             screen.blit(obs_img[obs_t[i]], obs_rect)
-        if collide(*player_rect, *obs_rect) and not game_over and (mode == "normal" or mode == "m boss appear"):
+        if collide(*player_rect, *obs_rect) and not game_over and (mode == "normal"):
             bgm.stop()
             game_over = True
     
