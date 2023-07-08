@@ -240,6 +240,8 @@ while 1:
             game_over = True
     
     score_color = (0, 0, 0)
+    if mode == "m boss":
+        score_color = (255, 255, 255)
     scoretxt = font1.render('Score: ' + str(score), True, score_color)
     screen.blit(scoretxt, (10, 10))
 
