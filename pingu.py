@@ -80,7 +80,7 @@ def collide(x, y, w, h, x_, y_, w_, h_):
     return x < x_ + w_ and y < y_ + h_ and x + w > x_ and y + h > y_
 
 def game_restart():
-    global player_y, gravity, sliding, jumping, jump_cnt, obs_x, obs_t, game_over, score, mode, hand_up, obs_y, sc_shake_x, sc_shake_y, shake_frame, hand_y, boss_y, boss_x
+    global player_y, gravity, sliding, jumping, jump_cnt, obs_x, obs_t, game_over, score, mode, hand_up, obs_y, sc_shake_x, sc_shake_y, shake_frame, hand_y, boss_y, boss_x, boss_turn
     player_y = opy
     gravity = 0 
     sliding = False
@@ -91,6 +91,7 @@ def game_restart():
     score = 0
     hand_y = screen_h - floor_h - 34 + 300
     boss_x, boss_y = 810, screen_h - floor_h
+    boss_turn = 0
     sc_shake_x = sc_shake_y = 0
     shake_frame = 0
     mode = "normal"
