@@ -39,10 +39,10 @@ bgm.set_volume(0.5)
 bgm.play(-1)
 
 # 장애물 변수 선언
-obs_x = [screen_w, screen_w * 3 / 2]
-obs_t = [random.randint(1, 3), random.randint(1, 3)]
+obs_x = [screen_w, screen_w * 4 / 3 + random.randint(0, 200), screen_w * 5 / 3 + random.randint(200, 400)]
+obs_t = [random.randint(1, 3), random.randint(1, 3), random.randint(1, 3)]
 obs_w, obs_h = 55, 80
-obs_speed = [8,8]
+obs_speed = [8,8,8]
 
 # 스테이지 관련 변수 선언
 score = 0
@@ -65,8 +65,8 @@ def game_restart():
     jumping = False
     jump_cnt = 2
     score = 0
-    obs_x = [screen_w, screen_w * 3 / 2]
-    obs_t = [random.randint(1, 3), random.randint(1, 3)]
+    obs_x = [screen_w, screen_w * 4 / 3 + random.randint(0, 200), screen_w * 5 / 3 + random.randint(200, 400)]
+    obs_t = [random.randint(1, 3), random.randint(1, 3), random.randint(1, 3)]
     game_over = False
     bgm.play()
 
@@ -105,10 +105,10 @@ while 1:
         
     
         # 장애물 움직이기
-        for i in range(2): 
+        for i in range(3): 
             obs_x[i] -= obs_speed[i]
             if obs_x[i] + obs_w <= 0:
-                px = screen_w + random.randint(0, 200)
+                px = obs_x[i-1] + screen_w / 3 + random.randint(0, 200)
                 obs_t[i] = random.randint(1, 3)
                 obs_x[i] += px
                 score += 1
@@ -131,7 +131,7 @@ while 1:
         screen.blit(player_slide_img, player_rect)
     # pygame.draw.rect(screen, (0, 0, 255), player_rect)
     # 장애물 그리기
-    for i in range(2):
+    for i in range(3):
         obs_rect = []
         if obs_t[i] == 3:
             obs_rect =  [obs_x[i], screen_h - floor_h - player_h * 4 / 5 - obs_h * obs_t[i], obs_w, obs_h * obs_t[i]]
