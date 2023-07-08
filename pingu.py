@@ -40,7 +40,7 @@ jump_cnt = 2
 # 보스 관련 변수 선언
 boss_hand_x = [850, 960]
 hand_y = screen_h - floor_h - 34 + 300
-boss_x, boss_y = 870, screen_h
+boss_x, boss_y = 810, screen_h
 hand_up = True
 
 # 소리 관련 변수 설정
@@ -152,14 +152,14 @@ while 1:
             else:
                 hand_y += 20
                 if hand_y >= screen_h - floor_h - 14:
-                    hand_y = screen_h - floor_h - 14
+                    hand_y = screen_h - floor_h - 16
                     mode = "m boss"
                     shake_frame = 30
                     boom_sound.play()
     if not hand_up:
         obs_y -= 50
-        if boss_y >= screen_h - floor_h - 100:
-            boss_y -= 10
+        if boss_y >= screen_h - floor_h - 200:
+            boss_y -= 3
     
     if shake_frame > 0:
         shake_frame -= 1
@@ -179,7 +179,7 @@ while 1:
         screen.blit(boss_hand[1], (boss_hand_x[1] + sc_shake_x, hand_y + sc_shake_y))
     screen.blit(boss_img, (boss_x + sc_shake_x, boss_y + sc_shake_y))
     # 바닥 그리기
-    pygame.draw.rect(screen, (100, 70, 70), [0 + sc_shake_x, screen_h - floor_h + sc_shake_y, screen_w, floor_h])
+    pygame.draw.rect(screen, (100, 70, 70), [0 + sc_shake_x, screen_h - floor_h + sc_shake_y, screen_w, floor_h * 2])
     pygame.draw.rect(screen, (0, 200, 0), [0 + sc_shake_x, screen_h - floor_h + sc_shake_y, screen_w, 30])
     if not hand_up:
         # 중간 보스 그리기
