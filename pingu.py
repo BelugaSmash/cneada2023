@@ -198,6 +198,7 @@ while 1:
         screen.blit(boss_hand[0], (boss_hand_x[0] + sc_shake_x, hand_y + sc_shake_y))
         screen.blit(boss_hand[1], (boss_hand_x[1] + sc_shake_x, hand_y + sc_shake_y))
     boss_rect = [boss_x + sc_shake_x, boss_y + sc_shake_y, 309, 800]
+    boss_hitbox = [boss_x + 30 + sc_shake_x, boss_y + 50 + sc_shake_y, 309 - 60, 750]
     if boss_attack == 0:
         screen.blit(boss_img, boss_rect)
     elif boss_attack == 1 or boss_attack == 2:
@@ -217,7 +218,7 @@ while 1:
     else:
         screen.blit(player_slide_img, player_rect)
     # pygame.draw.rect(screen, (0, 0, 255), player_rect)
-    if collide(*player_rect, *boss_rect) and not game_over:
+    if collide(*player_rect, *boss_hitbox) and not game_over:
         bgm.stop()
         game_over = True
     # 장애물 그리기
