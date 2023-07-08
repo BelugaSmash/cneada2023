@@ -39,7 +39,7 @@ bgm.set_volume(0.5)
 bgm.play(-1)
 
 # 장애물 변수 선언
-obs_x = [screen_w, screen_w * 4 / 3 + random.randint(0, 200), screen_w * 5 / 3 + random.randint(200, 400)]
+obs_x = [screen_w, screen_w * 4 / 3 + random.randint(100, 300), screen_w * 5 / 3 + random.randint(400, 600)]
 obs_t = [random.randint(1, 3), random.randint(1, 3), random.randint(1, 3)]
 obs_w, obs_h = 55, 80
 obs_speed = [8,8,8]
@@ -108,7 +108,7 @@ while 1:
         for i in range(3): 
             obs_x[i] -= obs_speed[i]
             if obs_x[i] + obs_w <= 0:
-                px = obs_x[i-1] + screen_w / 3 + random.randint(0, 200)
+                px = obs_x[i-1] + screen_w / 3 + random.randint(100, 300)
                 obs_t[i] = random.randint(1, 3)
                 obs_x[i] += px
                 score += 1
