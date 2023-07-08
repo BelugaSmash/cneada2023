@@ -17,6 +17,7 @@ screen = pygame.display.set_mode((screen_w, screen_h))
 cpath = os.path.dirname(__file__)
 player_walk_img = [pygame.image.load(f"resource/pingu_walk/pingu_{str(i).zfill(2)}.png") for i in range(28)]
 player_slide_img = pygame.image.load("resource/pingu_slide.png")
+boss_hand = [pygame.image.load("resource/boss_hand_left.png"), pygame.image.load("resource/boss_hand_right.png")]
 
 floor_h = 200
 
@@ -30,6 +31,10 @@ gravity = 0
 sliding = False 
 jumping = False
 jump_cnt = 2
+
+# 보스 관련 변수 선언
+l_hand_x, r_hand_x = 800, 1000
+hand_y = screen_h - floor_h - 234
 
 # 소리 관련 변수 설정
 bgm = pygame.mixer.Sound("resource/it's just burning memory.wav")
@@ -46,6 +51,8 @@ obs_speed = [8,8,8]
 
 # 스테이지 관련 변수 선언
 score = 0
+m_boss_score = 100
+mode = "normal"
 font1 = pygame.font.SysFont('Sans', 30)
 
 game_over = False
@@ -58,13 +65,14 @@ def collide(x, y, w, h, x_, y_, w_, h_):
     return x < x_ + w_ and y < y_ + h_ and x + w > x_ and y + h > y_
 
 def game_restart(): 
-    global player_y, gravity, sliding, jumping, jump_cnt, obs_x, obs_t, game_over, score
+    global player_y, gravity, sliding, jumping, jump_cnt, obs_x, obs_t, game_over, score, mode
     player_y = opy
     gravity = 0 
     sliding = False
     jumping = False
     jump_cnt = 2
     score = 0
+    mode = "normal"
     obs_x = [screen_w, screen_w * 4 / 3 + random.randint(0, 200), screen_w * 5 / 3 + random.randint(200, 400)]
     obs_t = [random.randint(1, 3), random.randint(1, 3), random.randint(1, 3)]
     game_over = False
@@ -112,12 +120,14 @@ while 1:
                 obs_t[i] = random.randint(1, 3)
                 obs_x[i] += px
                 score += 1
+                if score == m_boss_score:
+                    mode = "m boss"
                 #obs_speed[i] = random.randint(5,20)
         player_anim_frame += 1
         if player_anim_frame == 3:
             player_anim += 1
             player_anim_frame = 0
-    
+        
     # 화면 채우기
     screen.fill((50, 150, 200))
     # 바닥 그리기
