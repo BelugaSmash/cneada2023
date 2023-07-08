@@ -39,7 +39,7 @@ bgm.play(-1)
 obs_x = [screen_w, screen_w * 3 / 2]
 obs_t = [random.randint(1, 3), random.randint(1, 3)]
 obs_w, obs_h = 55, 80
-obs_speed = 8
+obs_speed = [8,8]
 
 game_over = False
 
@@ -98,11 +98,12 @@ while 1:
     
         # 장애물 움직이기
         for i in range(2): 
-            obs_x[i] -= obs_speed
+            obs_x[i] -= obs_speed[i]
             if obs_x[i] + obs_w <= 0:
                 px = obs_x[abs(1 - i)] + screen_w / 2 + random.randint(0, 700)
                 obs_t[i] = random.randint(1, 3)
                 obs_x[i] += px
+                obs_speed[i] = random.randint(5,20)
         player_anim_frame += 1
         if player_anim_frame == 3:
             player_anim += 1
