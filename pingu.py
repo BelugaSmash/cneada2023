@@ -18,6 +18,7 @@ cpath = os.path.dirname(__file__)
 player_walk_img = [pygame.image.load(f"resource/pingu_walk/pingu_{str(i).zfill(2)}.png") for i in range(28)]
 player_slide_img = pygame.image.load("resource/pingu_slide.png")
 boss_hand = [pygame.image.load("resource/boss_hand_left.png"), pygame.image.load("resource/boss_hand_right.png")]
+boss_img = pygame.image.load("resource/boss.png")
 
 floor_h = 200
 
@@ -33,8 +34,10 @@ jumping = False
 jump_cnt = 2
 
 # 보스 관련 변수 선언
-l_hand_x, r_hand_x = 800, 1000
-hand_y = screen_h - floor_h - 234
+boss_hand_x = [850, 960]
+hand_y = screen_h - floor_h - 34 + 300
+boss_x, boss_y = 870, screen_h
+hand_up = True
 
 # 소리 관련 변수 설정
 bgm = pygame.mixer.Sound("resource/it's just burning memory.wav")
@@ -47,11 +50,12 @@ bgm.play(-1)
 obs_x = [screen_w, screen_w * 4 / 3 + random.randint(100, 300), screen_w * 5 / 3 + random.randint(400, 600)]
 obs_t = [random.randint(1, 3), random.randint(1, 3), random.randint(1, 3)]
 obs_w, obs_h = 55, 80
+obs_y = 0
 obs_speed = [8,8,8]
 
 # 스테이지 관련 변수 선언
 score = 0
-m_boss_score = 100
+m_boss_score = 5
 mode = "normal"
 font1 = pygame.font.SysFont('Sans', 30)
 
@@ -64,12 +68,14 @@ clock = pygame.time.Clock()
 def collide(x, y, w, h, x_, y_, w_, h_):
     return x < x_ + w_ and y < y_ + h_ and x + w > x_ and y + h > y_
 
-def game_restart(): 
-    global player_y, gravity, sliding, jumping, jump_cnt, obs_x, obs_t, game_over, score, mode
+def game_restart():
+    global player_y, gravity, sliding, jumping, jump_cnt, obs_x, obs_t, game_over, score, mode, hand_up, obs_y
     player_y = opy
     gravity = 0 
     sliding = False
     jumping = False
+    hand_up = True
+    obs_y = 0
     jump_cnt = 2
     score = 0
     mode = "normal"
@@ -119,20 +125,47 @@ while 1:
                 px = obs_x[i-1] + screen_w / 3 + random.randint(100, 300)
                 obs_t[i] = random.randint(1, 3)
                 obs_x[i] += px
-                score += 1
-                if score == m_boss_score:
-                    mode = "m boss"
+                if score < m_boss_score:
+                    score += 1
+                    if score == m_boss_score:
+                        mode = "m boss appear"
                 #obs_speed[i] = random.randint(5,20)
         player_anim_frame += 1
         if player_anim_frame == 3:
             player_anim += 1
             player_anim_frame = 0
         
+        # 중간보스 등장
+        if mode == "m boss appear":
+            if hand_up:
+                hand_y -= 2
+                if hand_y <= screen_h - floor_h - 34 - 150:
+                    hand_up = False
+            else:
+                hand_y += 20
+                if hand_y >= screen_h - floor_h - 24:
+                    mode = "m boss"
+    if not hand_up:
+        obs_y -= 50
+        if boss_y >= screen_h - floor_h - 100:
+            boss_y -= 10
     # 화면 채우기
-    screen.fill((50, 150, 200))
+    bg_color = (50, 150, 200)
+    if mode == "m boss":
+        bg_color = (200, 50, 50)
+    screen.fill(bg_color)
+    if hand_up:
+        # 중간 보스 그리기
+        screen.blit(boss_hand[0], (boss_hand_x[0], hand_y))
+        screen.blit(boss_hand[1], (boss_hand_x[1], hand_y))
+    screen.blit(boss_img, (boss_x, boss_y))
     # 바닥 그리기
     pygame.draw.rect(screen, (100, 70, 70), [0, screen_h - floor_h, screen_w, floor_h])
     pygame.draw.rect(screen, (0, 200, 0), [0, screen_h - floor_h, screen_w, 30])
+    if not hand_up:
+        # 중간 보스 그리기
+        screen.blit(boss_hand[0], (boss_hand_x[0], hand_y))
+        screen.blit(boss_hand[1], (boss_hand_x[1], hand_y))
     # 플레이어 그리기
     player_rect = [100, player_y + (player_h / 2 if sliding and not jumping else 0), player_w, player_h / (2 if sliding and not jumping  else 1)]
     if jumping or not sliding:
@@ -144,11 +177,11 @@ while 1:
     for i in range(3):
         obs_rect = []
         if obs_t[i] == 3:
-            obs_rect =  [obs_x[i], screen_h - floor_h - player_h * 4 / 5 - obs_h * obs_t[i], obs_w, obs_h * obs_t[i]]
+            obs_rect =  [obs_x[i], screen_h - floor_h - player_h * 4 / 5 - obs_h * obs_t[i] + obs_y, obs_w, obs_h * obs_t[i]]
         else:
-            obs_rect = [obs_x[i], screen_h - floor_h - obs_h * obs_t[i], obs_w, obs_h * obs_t[i]]
+            obs_rect = [obs_x[i], screen_h - floor_h - obs_h * obs_t[i] + obs_y, obs_w, obs_h * obs_t[i]]
         pygame.draw.rect(screen, (255, 0, 0), obs_rect)
-        if collide(*player_rect, *obs_rect) and not game_over:
+        if collide(*player_rect, *obs_rect) and not game_over and mode == "normal":
             bgm.stop()
             game_over = True
     
