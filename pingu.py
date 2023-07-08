@@ -174,8 +174,11 @@ while 1:
         if boss_turn == 0:
             boss_turn = 60 * 6
             boss_attack = 1
+            shake_frame = 10
 
     if boss_attack == 1:
+        if shake_frame > 0:
+            boss_x -= 20
         boss_x -= 10
         if boss_x == 810:
             boss_attack = 0
