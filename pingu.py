@@ -15,9 +15,12 @@ screen = pygame.display.set_mode((screen_w, screen_h))
 
 # 변수들 초기화
 cpath = os.path.dirname(__file__)
-player_img = [pygame.image.load(f"resource/player/pingu_{str(i).zfill(2)}.png") for i in range(28)]
+player_walk_img = [pygame.image.load(f"resource/pingu_walk/pingu_{str(i).zfill(2)}.png") for i in range(28)]
+player_slide_img = pygame.image.load("resource/pingu_slide.png")
 
 floor_h = 200
+
+#플레이어 관련 변수 선언
 player_w, player_h = 55, 55
 player_y = screen_h - floor_h - player_h
 player_anim_frame = 0
@@ -122,7 +125,10 @@ while 1:
     pygame.draw.rect(screen, (0, 200, 0), [0, screen_h - floor_h, screen_w, 30])
     # 플레이어 그리기
     player_rect = [100, player_y + (player_h / 2 if sliding and not jumping else 0), player_w, player_h / (2 if sliding and not jumping  else 1)]
-    screen.blit(player_img[player_anim % 28], player_rect)
+    if jumping or not sliding:
+        screen.blit(player_walk_img[player_anim % 28], player_rect)
+    else:
+        screen.blit(player_slide_img, player_rect)
     # pygame.draw.rect(screen, (0, 0, 255), player_rect)
     # 장애물 그리기
     for i in range(2):
