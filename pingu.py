@@ -51,6 +51,7 @@ hand_up = True
 bgm = pygame.mixer.Sound("resource/it's just burning memory.wav")
 jump_sound = pygame.mixer.Sound("resource/juuuuuump.wav")
 boom_sound = pygame.mixer.Sound("resource/boom.wav")
+m_boss_bgm = pygame.mixer.Sound("resource/m_boss.mp3")
 jump_sound.set_volume(0.35)
 bgm.set_volume(0.5)
 bgm.play(-1)
@@ -98,6 +99,7 @@ def game_restart():
     obs_t = [random.randint(1, 3), random.randint(1, 3), random.randint(1, 3)]
     game_over = False
     bgm.play()
+    m_boss_bgm.stop()
 
 while 1:
     # FPS를 60으로 설정
@@ -164,6 +166,7 @@ while 1:
                     mode = "m boss"
                     shake_frame = 30
                     boom_sound.play()
+                    m_boss_bgm.play()
     if not hand_up:
         obs_y -= 50
         if boss_y >= screen_h - floor_h - 260:
