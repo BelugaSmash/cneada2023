@@ -100,10 +100,10 @@ while 1:
         for i in range(2): 
             obs_x[i] -= obs_speed[i]
             if obs_x[i] + obs_w <= 0:
-                px = obs_x[abs(1 - i)] + screen_w / 2 + random.randint(0, 700)
+                px = screen_w + random.randint(0, 200)
                 obs_t[i] = random.randint(1, 3)
                 obs_x[i] += px
-                obs_speed[i] = random.randint(5,20)
+                #obs_speed[i] = random.randint(5,20)
         player_anim_frame += 1
         if player_anim_frame == 3:
             player_anim += 1
