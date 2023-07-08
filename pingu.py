@@ -165,7 +165,7 @@ while 1:
                     boom_sound.play()
     if not hand_up:
         obs_y -= 50
-        if boss_y >= screen_h - floor_h - 300:
+        if boss_y >= screen_h - floor_h - 260:
             boss_y -= 3
 
     if mode == "m boss":
@@ -175,7 +175,7 @@ while 1:
             boss_attack = 1
 
     if boss_attack == 1:
-        boss_x -= 20
+        boss_x -= 10
         if boss_x == 810:
             boss_attack = 0
         if boss_x <= -309:
@@ -231,7 +231,7 @@ while 1:
             pygame.draw.rect(screen, (255, 0, 0), obs_rect)
         else:
             screen.blit(obs_img[obs_t[i]], obs_rect)
-        if collide(*player_rect, *obs_rect) and not game_over and (mode == "normal"):
+        if collide(*player_rect, *obs_rect) and not game_over and (mode == "normal" or mode == "m boss appear"):
             bgm.stop()
             game_over = True
     
