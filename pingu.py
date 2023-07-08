@@ -13,12 +13,13 @@ pygame.display.set_caption("Pingu's Adventure II")
 screen_w, screen_h = 1280, 720
 screen = pygame.display.set_mode((screen_w, screen_h))
 
-# 변수들 초기화
+# 이미지 변수들 초기화
 cpath = os.path.dirname(__file__)
 player_walk_img = [pygame.image.load(f"resource/pingu_walk/pingu_{str(i).zfill(2)}.png") for i in range(28)]
 player_slide_img = pygame.image.load("resource/pingu_slide.png")
 boss_hand = [pygame.image.load("resource/boss_hand_left.png"), pygame.image.load("resource/boss_hand_right.png")]
 boss_img = pygame.image.load("resource/boss.png")
+obs_img = [0, pygame.image.load("resource/obstacle1.png"), None, None]
 
 floor_h = 200
 
@@ -199,7 +200,10 @@ while 1:
             obs_rect =  [obs_x[i] + sc_shake_x, screen_h - floor_h - player_h * 4 / 5 - obs_h * obs_t[i] + obs_y + sc_shake_y, obs_w, obs_h * obs_t[i]]
         else:
             obs_rect = [obs_x[i] + sc_shake_x, screen_h - floor_h - obs_h * obs_t[i] + obs_y + sc_shake_y, obs_w, obs_h * obs_t[i]]
-        pygame.draw.rect(screen, (255, 0, 0), obs_rect)
+        if obs_img[obs_t[i]] == None:
+            pygame.draw.rect(screen, (255, 0, 0), obs_rect)
+        else:
+            screen.blit(obs_img[obs_t[i]], obs_rect)
         if collide(*player_rect, *obs_rect) and not game_over and (mode == "normal" or mode == "m boss appear"):
             bgm.stop()
             game_over = True
