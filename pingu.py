@@ -168,33 +168,33 @@ while 1:
                     shake_frame = 30
                     boom_sound.play()
                     m_boss_bgm.play()
-    if not hand_up:
-        obs_y -= 50
-        if boss_y >= screen_h - floor_h - 260:
-            boss_y -= 3
+        if not hand_up:
+            obs_y -= 50
+            if boss_y >= screen_h - floor_h - 260:
+                boss_y -= 3
 
-    if mode == "m boss":
-        boss_turn -= 1
-        if boss_turn == 0:
-            boss_turn = 60 * 6
-            boss_attack = 1
-            shake_frame = 10
+        if mode == "m boss":
+            boss_turn -= 1
+            if boss_turn == 0:
+                boss_turn = 60 * 6
+                boss_attack = 1
+                shake_frame = 10
 
-    if boss_attack == 1:
+        if boss_attack == 1:
+            if shake_frame > 0:
+                boss_x -= 20
+            boss_x -= 10
+            if boss_x == 810:
+                boss_attack = 0
+            if boss_x <= -309:
+                boss_x += screen_w + 200
+        
         if shake_frame > 0:
-            boss_x -= 20
-        boss_x -= 10
-        if boss_x == 810:
-            boss_attack = 0
-        if boss_x <= -309:
-            boss_x += screen_w + 200
-    
-    if shake_frame > 0:
-        shake_frame -= 1
-        sc_shake_x = random.randint(-50, 50)
-        sc_shake_y = random.randint(-50, 50)
-    else:
-        sc_shake_x = sc_shake_y = 0
+            shake_frame -= 1
+            sc_shake_x = random.randint(-50, 50)
+            sc_shake_y = random.randint(-50, 50)
+        else:
+            sc_shake_x = sc_shake_y = 0
 
     # 화면 채우기
     bg_color = (50, 150, 200)
