@@ -22,6 +22,7 @@ boss_img = pygame.image.load("resource/boss.png")
 boss_attack_img = pygame.image.load("resource/boss_attack.png")
 obs_img = [0, pygame.image.load("resource/obstacle1.png"), pygame.image.load("resource/obstacle2.png"), None]
 laser_img = pygame.image.load("resource/laser.png")
+missile_img = [pygame.image.load(f"resource/missile{i}.png") for i in range(2)]
 bg_img = pygame.image.load("resource/bg.png")
 
 floor_h = 200
@@ -69,6 +70,9 @@ score = 0
 m_boss_score = 5
 boss_turn = 100
 boss_attack = 0
+missile_anim = 0
+missile_fire = False
+missile_x, missile_y = 100 + screen_w, screen_h - floor_h - 150 - screen_w / 2
 mode = "normal"
 font1 = pygame.font.SysFont('Sans', 30)
 
@@ -82,7 +86,8 @@ def collide(x, y, w, h, x_, y_, w_, h_):
     return x < x_ + w_ and y < y_ + h_ and x + w > x_ and y + h > y_
 
 def game_restart():
-    global player_y, gravity, sliding, jumping, jump_cnt, obs_x, obs_t, game_over, score, mode, hand_up, obs_y, sc_shake_x, sc_shake_y, shake_frame, hand_y, boss_y, boss_x
+    global player_y, gravity, sliding, jumping, jump_cnt, obs_x, obs_t, game_over, score, mode, hand_up, obs_y, sc_shake_x, sc_shake_y, shake_frame, \
+        hand_y, boss_y, boss_x, missile_x, missile_y, missile_fire
     player_y = opy
     gravity = 0 
     sliding = False
@@ -93,6 +98,8 @@ def game_restart():
     score = 0
     hand_y = screen_h - floor_h - 34 + 300
     boss_x, boss_y = 810, screen_h - floor_h
+    missile_x, missile_y = 100 + screen_w, screen_h - floor_h - 150 - screen_w / 2
+    missile_fire = False
     sc_shake_x = sc_shake_y = 0
     shake_frame = 0
     mode = "normal"
@@ -177,8 +184,9 @@ while 1:
             boss_turn -= 1
             if boss_turn == 0:
                 boss_turn = 60 * 6
-                boss_attack = 1
-                shake_frame = 10
+                boss_attack = random.randint(1, 2)
+                if boss_attack == 1:
+                    shake_frame = 10
 
         if boss_attack == 1:
             if shake_frame > 0:
@@ -188,7 +196,26 @@ while 1:
                 boss_attack = 0
             if boss_x <= -309:
                 boss_x += screen_w + 200
+
+        if boss_attack == 2:
+            if hand_y >= screen_h - floor_h - 34 - 150:
+                hand_y -= 3
+            else:
+                hand_y = screen_h - floor_h - 16
+                shake_frame = 30
+                missile_fire = True
+                missile_anim = 0
+                missile_x, missile_y = 100 + screen_w, screen_h - floor_h - 150 - screen_w / 2
+                boss_attack = 0
         
+        if missile_fire:
+            if missile_y >= screen_h - floor_h - 30 - 175:
+                missile_x -= 3
+                missile_anim = 1
+            else:
+                missile_x -= 40
+                missile_y += 20
+                    
         if shake_frame > 0:
             shake_frame -= 1
             sc_shake_x = random.randint(-50, 50)
@@ -221,6 +248,10 @@ while 1:
         # 중간 보스 그리기
         screen.blit(boss_hand[0], (boss_hand_x[0] + sc_shake_x, hand_y + sc_shake_y))
         screen.blit(boss_hand[1], (boss_hand_x[1] + sc_shake_x, hand_y + sc_shake_y))
+    # 미사일(보스 공격) 그리기
+    missile_hitbox = [missile_x + 20 + sc_shake_x, missile_y + 75 + sc_shake_y, 100, 75]
+    pygame.draw.rect(screen, (255, 0, 0), missile_hitbox) # 히트박스 그리기
+    screen.blit(missile_img[missile_anim], (missile_x + sc_shake_x, missile_y + sc_shake_y))
     # 플레이어 그리기
     player_rect = [100 + sc_shake_x, player_y + (player_h / 2 if sliding and not jumping else 0) + sc_shake_y, player_w, player_h / (2 if sliding and not jumping  else 1)]
     if jumping or not sliding:
@@ -228,7 +259,7 @@ while 1:
     else:
         screen.blit(player_slide_img, player_rect)
     # pygame.draw.rect(screen, (0, 0, 255), player_rect)
-    if collide(*player_rect, *boss_hitbox) and not game_over:
+    if (collide(*player_rect, *boss_hitbox) or collide(*player_rect, *missile_hitbox)) and not game_over:
         bgm.stop()
         game_over = True
     # 장애물 그리기
