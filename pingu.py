@@ -210,7 +210,7 @@ while 1:
         
         if missile_fire:
             if missile_y >= screen_h - floor_h - 30 - 175:
-                missile_x -= 3
+                missile_x -= 2
                 missile_anim = 1
             else:
                 missile_x -= 40
@@ -234,7 +234,7 @@ while 1:
         screen.blit(boss_hand[0], (boss_hand_x[0] + sc_shake_x, hand_y + sc_shake_y))
         screen.blit(boss_hand[1], (boss_hand_x[1] + sc_shake_x, hand_y + sc_shake_y))
     boss_rect = [boss_x + sc_shake_x, boss_y + sc_shake_y, 309, 800]
-    boss_hitbox = [boss_x + 100 + sc_shake_x, boss_y + 50 + sc_shake_y, 309 - 200, 750]
+    boss_hitbox = [boss_x + 100 + sc_shake_x, boss_y + 50  + sc_shake_y, 309 - 200, 750]
     pygame.draw.rect(screen, (0, 255, 0), boss_hitbox)
     if boss_attack == 0:
         screen.blit(boss_img, boss_rect)
