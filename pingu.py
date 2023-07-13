@@ -79,6 +79,7 @@ mode = "normal"
 font1 = pygame.font.SysFont('Sans', 30)
 
 game_over = False
+game_over_frame = 0
 
 # FPS 설정을 위한 변수
 clock = pygame.time.Clock()
@@ -89,7 +90,7 @@ def collide(x, y, w, h, x_, y_, w_, h_):
 
 def game_restart():
     global player_y, gravity, sliding, jumping, jump_cnt, obs_x, obs_t, game_over, score, mode, hand_up, obs_y, sc_shake_x, sc_shake_y, shake_frame, \
-        hand_y, boss_y, boss_x, missile_x, missile_y, missile_fire, attack_frame, laser_shot, boss_attack
+        hand_y, boss_y, boss_x, missile_x, missile_y, missile_fire, attack_frame, laser_shot, boss_attack, game_over_frame
     player_y = opy
     gravity = 0 
     sliding = False
@@ -107,6 +108,7 @@ def game_restart():
     sc_shake_x = sc_shake_y = 0
     shake_frame = 0
     attack_frame = 0
+    game_over_frame = 0
     mode = "normal"
     obs_x = [screen_w, screen_w * 4 / 3 + random.randint(0, 200), screen_w * 5 / 3 + random.randint(200, 400)]
     obs_t = [random.randint(1, 3), random.randint(1, 3), random.randint(1, 3)]
@@ -122,7 +124,7 @@ while 1:
         if event.type == pygame.QUIT:
             sys.exit()
         if event.type == pygame.KEYDOWN:
-            if game_over:
+            if game_over and game_over_frame >= 60:
                 game_restart()
             else:
                 if jump_cnt > 0:
@@ -238,7 +240,8 @@ while 1:
             sc_shake_y = random.randint(-50, 50)
         else:
             sc_shake_x = sc_shake_y = 0
-
+    else:
+        game_over_frame += 1
     # 화면(배경) 채우기
     bg_color = (50, 150, 200)
     if mode == "normal" or mode == "m boss appear":
@@ -266,7 +269,7 @@ while 1:
     elif boss_attack == 1 or boss_attack == 2:
         screen.blit(boss_attack_img, boss_rect)
     elif boss_attack == 3:
-        screen.blit(boss_attack_img if not laser_shot else boss_img, boss_rect)
+        screen.blit(boss_img if not laser_shot else boss_attack_img, boss_rect)
     #screen.blit(laser_img, (0, 0))
     # 바닥 그리기
     pygame.draw.rect(screen, (100, 70, 70), [0 + sc_shake_x, screen_h - floor_h + sc_shake_y, screen_w, floor_h * 2])
