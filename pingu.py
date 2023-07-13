@@ -223,7 +223,7 @@ while 1:
         else:
             sc_shake_x = sc_shake_y = 0
 
-    # 화면 채우기
+    # 화면(배경) 채우기
     bg_color = (50, 150, 200)
     if mode == "normal" or mode == "m boss appear":
         screen.fill(bg_color)
