@@ -70,6 +70,8 @@ score = 0
 m_boss_score = 5
 boss_turn = 100
 boss_attack = 0
+attack_frame = 0
+laser_shot = False
 missile_anim = 0
 missile_fire = False
 missile_x, missile_y = 100 + screen_w, screen_h - floor_h - 150 - screen_w / 2
@@ -87,7 +89,7 @@ def collide(x, y, w, h, x_, y_, w_, h_):
 
 def game_restart():
     global player_y, gravity, sliding, jumping, jump_cnt, obs_x, obs_t, game_over, score, mode, hand_up, obs_y, sc_shake_x, sc_shake_y, shake_frame, \
-        hand_y, boss_y, boss_x, missile_x, missile_y, missile_fire
+        hand_y, boss_y, boss_x, missile_x, missile_y, missile_fire, attack_frame, laser_shot, boss_attack
     player_y = opy
     gravity = 0 
     sliding = False
@@ -98,10 +100,13 @@ def game_restart():
     score = 0
     hand_y = screen_h - floor_h - 34 + 300
     boss_x, boss_y = 810, screen_h - floor_h
+    boss_attack = 0
     missile_x, missile_y = 100 + screen_w, screen_h - floor_h - 150 - screen_w / 2
     missile_fire = False
+    laser_shot = False
     sc_shake_x = sc_shake_y = 0
     shake_frame = 0
+    attack_frame = 0
     mode = "normal"
     obs_x = [screen_w, screen_w * 4 / 3 + random.randint(0, 200), screen_w * 5 / 3 + random.randint(200, 400)]
     obs_t = [random.randint(1, 3), random.randint(1, 3), random.randint(1, 3)]
@@ -184,9 +189,11 @@ while 1:
             boss_turn -= 1
             if boss_turn == 0:
                 boss_turn = 60 * 6
-                boss_attack = random.randint(1, 2)
+                boss_attack = random.randint(1, 3)
                 if boss_attack == 1:
                     shake_frame = 10
+                elif boss_attack == 3:
+                    attack_frame = 160
 
         if boss_attack == 1:
             if shake_frame > 0:
@@ -206,6 +213,15 @@ while 1:
                 missile_fire = True
                 missile_anim = 0
                 missile_x, missile_y = 100 + screen_w, screen_h - floor_h - 150 - screen_w / 2
+                boss_attack = 0
+
+        if boss_attack == 3:
+            attack_frame -= 1
+            if attack_frame % 40 == 0:
+                laser_shot = not laser_shot
+                if laser_shot:
+                    shake_frame = 30
+            if attack_frame == 0:
                 boss_attack = 0
         
         if missile_fire:
@@ -229,23 +245,34 @@ while 1:
         screen.fill(bg_color)
     elif mode == "m boss":
         screen.blit(bg_img, (0,0))
+     
+    # 레이저(보스 공격) 그리기
+    laser_hitbox = [810 - screen_w + 100 + sc_shake_x, screen_h - floor_h - 75 + sc_shake_y, 1280, 50]
+    if boss_attack == 3 and not laser_shot and (attack_frame // 5) % 2 == 0:
+        pygame.draw.rect(screen, (200, 50, 50), laser_hitbox) # 레이저 경고 표시
+    if laser_shot:
+        screen.blit(laser_img, (810 - screen_w + 100 + sc_shake_x, screen_h - floor_h - 100 + sc_shake_y))
+    
     if hand_up:
-        # 중간 보스 그리기
+        # 중간 보스 손 그리기
         screen.blit(boss_hand[0], (boss_hand_x[0] + sc_shake_x, hand_y + sc_shake_y))
         screen.blit(boss_hand[1], (boss_hand_x[1] + sc_shake_x, hand_y + sc_shake_y))
     boss_rect = [boss_x + sc_shake_x, boss_y + sc_shake_y, 309, 800]
     boss_hitbox = [boss_x + 100 + sc_shake_x, boss_y + 50  + sc_shake_y, 309 - 200, 750]
     pygame.draw.rect(screen, (0, 255, 0), boss_hitbox)
+    # 중간보스 그리기
     if boss_attack == 0:
         screen.blit(boss_img, boss_rect)
     elif boss_attack == 1 or boss_attack == 2:
         screen.blit(boss_attack_img, boss_rect)
+    elif boss_attack == 3:
+        screen.blit(boss_attack_img if not laser_shot else boss_img, boss_rect)
     #screen.blit(laser_img, (0, 0))
     # 바닥 그리기
     pygame.draw.rect(screen, (100, 70, 70), [0 + sc_shake_x, screen_h - floor_h + sc_shake_y, screen_w, floor_h * 2])
     pygame.draw.rect(screen, (0, 200, 0), [0 + sc_shake_x, screen_h - floor_h + sc_shake_y, screen_w, 30])
     if not hand_up:
-        # 중간 보스 그리기
+        # 중간 보스 손 그리기
         screen.blit(boss_hand[0], (boss_hand_x[0] + sc_shake_x, hand_y + sc_shake_y))
         screen.blit(boss_hand[1], (boss_hand_x[1] + sc_shake_x, hand_y + sc_shake_y))
     # 미사일(보스 공격) 그리기
@@ -259,7 +286,10 @@ while 1:
     else:
         screen.blit(player_slide_img, player_rect)
     # pygame.draw.rect(screen, (0, 0, 255), player_rect)
-    if (collide(*player_rect, *boss_hitbox) or collide(*player_rect, *missile_hitbox)) and not game_over:
+    if (collide(*player_rect, *boss_hitbox) or \
+        collide(*player_rect, *missile_hitbox) or \
+        (collide(*player_rect, *laser_hitbox) and laser_shot)) and \
+        not game_over:
         bgm.stop()
         game_over = True
     # 장애물 그리기
