@@ -35,6 +35,8 @@ shake_frame = 0
 player_w, player_h = 55, 55
 player_y = screen_h - floor_h - player_h
 player_anim_frame = 0
+attack_cool_frame = 0
+player_attack = []
 player_anim = 0
 opy = player_y
 gravity = 0 
@@ -70,6 +72,7 @@ score = 0
 m_boss_score = 5
 boss_turn = 100
 boss_attack = 0
+boss_hp = 400
 attack_frame = 0
 laser_shot = False
 missile_anim = 0
@@ -90,7 +93,7 @@ def collide(x, y, w, h, x_, y_, w_, h_):
 
 def game_restart():
     global player_y, gravity, sliding, jumping, jump_cnt, obs_x, obs_t, game_over, score, mode, hand_up, obs_y, sc_shake_x, sc_shake_y, shake_frame, \
-        hand_y, boss_y, boss_x, missile_x, missile_y, missile_fire, attack_frame, laser_shot, boss_attack, game_over_frame
+        hand_y, boss_y, boss_x, missile_x, missile_y, missile_fire, attack_frame, laser_shot, boss_attack, game_over_frame, boss_hp
     player_y = opy
     gravity = 0 
     sliding = False
@@ -109,6 +112,7 @@ def game_restart():
     shake_frame = 0
     attack_frame = 0
     game_over_frame = 0
+    boss_hp = 400
     mode = "normal"
     obs_x = [screen_w, screen_w * 4 / 3 + random.randint(0, 200), screen_w * 5 / 3 + random.randint(200, 400)]
     obs_t = [random.randint(1, 3), random.randint(1, 3), random.randint(1, 3)]
@@ -135,6 +139,9 @@ while 1:
                         jump_sound.play()
                 if event.key == pygame.K_DOWN:
                     sliding = True
+                if event.key == pygame.K_x and mode == "m boss" and attack_cool_frame <= 0:
+                    player_attack.append([120, player_y + player_w / 2])
+                    attack_cool_frame = 10
         if event.type == pygame.KEYUP:
             if not game_over: 
                 if event.key == pygame.K_DOWN:
@@ -148,7 +155,9 @@ while 1:
             jumping = False
             jump_cnt = 2
         gravity -= 1.2
-        
+
+        # 플레이어 공격 쿨
+        attack_cool_frame -= 1        
     
         # 장애물 움직이기
         for i in range(3): 
@@ -182,6 +191,7 @@ while 1:
                     shake_frame = 30
                     boom_sound.play()
                     m_boss_bgm.play()
+        
         if not hand_up:
             obs_y -= 50
             if boss_y >= screen_h - floor_h - 260:
@@ -282,6 +292,22 @@ while 1:
     missile_hitbox = [missile_x + 20 + sc_shake_x, missile_y + 75 + sc_shake_y, 100, 75]
     pygame.draw.rect(screen, (255, 0, 0), missile_hitbox) # 히트박스 그리기
     screen.blit(missile_img[missile_anim], (missile_x + sc_shake_x, missile_y + sc_shake_y))
+
+    # 플레이어 공격 그리기
+    remove_t = []
+    for atk in player_attack:
+        atk[0] += 20
+        atk_rect = [atk[0] + sc_shake_x, atk[1] + sc_shake_y, 10, 10]
+        if atk[0] >= screen_w:
+            remove_t.append(atk)
+        elif collide(*atk_rect, *boss_hitbox):
+            boss_hp -= 1
+            remove_t.append(atk)
+        pygame.draw.rect(screen, (0, 0, 255), atk_rect)
+
+    for r in remove_t:
+        player_attack.remove(r)
+
     # 플레이어 그리기
     player_rect = [100 + sc_shake_x, player_y + (player_h / 2 if sliding and not jumping else 0) + sc_shake_y, player_w, player_h / (2 if sliding and not jumping  else 1)]
     if jumping or not sliding:
@@ -295,6 +321,7 @@ while 1:
         not game_over:
         bgm.stop()
         game_over = True
+    
     # 장애물 그리기
     for i in range(3):
         obs_rect = []
@@ -310,11 +337,20 @@ while 1:
             bgm.stop()
             game_over = True
     
+    # 점수 표시
     score_color = (0, 0, 0)
     if mode == "m boss":
         score_color = (255, 255, 255)
     scoretxt = font1.render('Score: ' + str(score), True, score_color)
     screen.blit(scoretxt, (10, 10))
+
+    # 보스 체력 표시
+    if mode == 'm boss':
+        pygame.draw.rect(screen, (200, 200, 200), [screen_w / 2 - 202, 18, 404, 24])
+        pygame.draw.rect(screen, (200, 50, 70), [screen_w / 2 - 200, 20, boss_hp, 20])
+        score_color = (200, 50, 70)
+        scoretxt = font1.render('Boss', True, score_color)
+        screen.blit(scoretxt, (screen_w / 2 - 300, 10))
 
     pygame.display.update()
 
