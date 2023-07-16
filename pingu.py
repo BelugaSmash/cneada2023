@@ -91,6 +91,7 @@ clock = pygame.time.Clock()
 def collide(x, y, w, h, x_, y_, w_, h_):
     return x < x_ + w_ and y < y_ + h_ and x + w > x_ and y + h > y_
 
+# 게임 시작할때 변수 선언
 def game_restart():
     global player_y, gravity, sliding, jumping, jump_cnt, obs_x, obs_t, game_over, score, mode, hand_up, obs_y, sc_shake_x, sc_shake_y, shake_frame, \
         hand_y, boss_y, boss_x, missile_x, missile_y, missile_fire, attack_frame, laser_shot, boss_attack, game_over_frame, boss_hp
@@ -147,6 +148,7 @@ while 1:
                 if event.key == pygame.K_DOWN:
                     sliding = False
 
+    # 게임 오버가 아니라면
     if not game_over:
         # 플레이어 움직이기
         player_y -= gravity
@@ -192,21 +194,29 @@ while 1:
                     boom_sound.play()
                     m_boss_bgm.play()
         
+        # 손으로 바닥 쿵 찍으면서 장애물 올라가고, 보스 나오는 부분
         if not hand_up:
             obs_y -= 50
             if boss_y >= screen_h - floor_h - 260:
                 boss_y -= 3
 
+        # 중간보스일때
         if mode == "m boss":
             boss_turn -= 1
-            if boss_turn == 0:
+            # 보스가 공격할 시간일떄
+            if boss_turn <= 0:
+                # 얼마나 뒤에 보스 공격을 한번 더할껀지
                 boss_turn = 60 * 6
+                # 공격 패턴 정하기
                 boss_attack = random.randint(1, 3)
+                # 1번 패턴이면 화면 흔들고
                 if boss_attack == 1:
                     shake_frame = 10
+                # 3번 패턴이면 레이저 발사 준비
                 elif boss_attack == 3:
                     attack_frame = 160
 
+        # 1번 패턴이면 화면 흔드는 동알 빨리 이동, 화면 안흔들릴시 천천히 이동하고 제자리 돌아오면 공격 끝내기
         if boss_attack == 1:
             if shake_frame > 0:
                 boss_x -= 20
@@ -216,6 +226,7 @@ while 1:
             if boss_x <= -309:
                 boss_x += screen_w + 200
 
+        # 2번 패턴이면 손위로 올린후 내려 찍으며 미사일 발사
         if boss_attack == 2:
             if hand_y >= screen_h - floor_h - 34 - 150:
                 hand_y -= 3
@@ -226,32 +237,40 @@ while 1:
                 missile_anim = 0
                 missile_x, missile_y = 100 + screen_w, screen_h - floor_h - 150 - screen_w / 2
                 boss_attack = 0
-
+        
+        # 3번 패턴일때 40 프레임마다 번갈아가며 레이저 껐다 켰다
         if boss_attack == 3:
             attack_frame -= 1
             if attack_frame % 40 == 0:
                 laser_shot = not laser_shot
+                # 레이저 켜지면 화면 흔들기
                 if laser_shot:
                     shake_frame = 30
+            # 레이저 발사 시간 끝나면 공격 끝내기
             if attack_frame == 0:
                 boss_attack = 0
         
+        # 미사일을 발사하면
         if missile_fire:
+            # 플레이어가 슬라이딩 해야할 높이까지 내려왔다면 왼쪽으로만 이동하고, 아니면 아래쪽으로도 이동
             if missile_y >= screen_h - floor_h - 30 - 175:
                 missile_x -= 2
                 missile_anim = 1
             else:
                 missile_x -= 40
                 missile_y += 20
-                    
+
+        # 화면 흔들기 효과 지속시간이 남았다면 sc_shake 변수 설정해 화면 흔들기(더 쎄게 흔들려면 -50, 50을 절댓값이 더 큰수로 바꾸면 됨)       
         if shake_frame > 0:
             shake_frame -= 1
             sc_shake_x = random.randint(-50, 50)
             sc_shake_y = random.randint(-50, 50)
         else:
             sc_shake_x = sc_shake_y = 0
+    # 게임 오버 상태라면 게임 오버 후 몇프레임 지났는지 확인
     else:
         game_over_frame += 1
+    
     # 화면(배경) 채우기
     bg_color = (50, 150, 200)
     if mode == "normal" or mode == "m boss appear":
@@ -259,62 +278,83 @@ while 1:
     elif mode == "m boss":
         screen.blit(bg_img, (0,0))
      
-    # 레이저(보스 공격) 그리기
+    # 레이저 히트박스 설정
     laser_hitbox = [810 - screen_w + 100 + sc_shake_x, screen_h - floor_h - 75 + sc_shake_y, 1280, 50]
+    # 레이저 발사 전이라면
     if boss_attack == 3 and not laser_shot and (attack_frame // 5) % 2 == 0:
-        pygame.draw.rect(screen, (200, 50, 50), laser_hitbox) # 레이저 경고 표시
+        # 레이저 경고 표시 그리기
+        pygame.draw.rect(screen, (200, 50, 50), laser_hitbox)
+    # 레이저 발사중이라면
     if laser_shot:
+        # 레이저(보스 공격) 그리기
         screen.blit(laser_img, (810 - screen_w + 100 + sc_shake_x, screen_h - floor_h - 100 + sc_shake_y))
     
     if hand_up:
         # 중간 보스 손 그리기
         screen.blit(boss_hand[0], (boss_hand_x[0] + sc_shake_x, hand_y + sc_shake_y))
         screen.blit(boss_hand[1], (boss_hand_x[1] + sc_shake_x, hand_y + sc_shake_y))
+    
+    # 보스 화면에 보여질 위치와 히트박스 설정
     boss_rect = [boss_x + sc_shake_x, boss_y + sc_shake_y, 309, 800]
     boss_hitbox = [boss_x + 100 + sc_shake_x, boss_y + 50  + sc_shake_y, 309 - 200, 750]
     pygame.draw.rect(screen, (0, 255, 0), boss_hitbox)
-    # 중간보스 그리기
+
+    # 보스 공격 패턴에 따라 중간보스 그리기
     if boss_attack == 0:
         screen.blit(boss_img, boss_rect)
     elif boss_attack == 1 or boss_attack == 2:
         screen.blit(boss_attack_img, boss_rect)
     elif boss_attack == 3:
         screen.blit(boss_img if not laser_shot else boss_attack_img, boss_rect)
-    #screen.blit(laser_img, (0, 0))
+    
     # 바닥 그리기
     pygame.draw.rect(screen, (100, 70, 70), [0 + sc_shake_x, screen_h - floor_h + sc_shake_y, screen_w, floor_h * 2])
     pygame.draw.rect(screen, (0, 200, 0), [0 + sc_shake_x, screen_h - floor_h + sc_shake_y, screen_w, 30])
+
     if not hand_up:
         # 중간 보스 손 그리기
         screen.blit(boss_hand[0], (boss_hand_x[0] + sc_shake_x, hand_y + sc_shake_y))
         screen.blit(boss_hand[1], (boss_hand_x[1] + sc_shake_x, hand_y + sc_shake_y))
-    # 미사일(보스 공격) 그리기
+
+    # 미사일 히트박스 설정
     missile_hitbox = [missile_x + 20 + sc_shake_x, missile_y + 75 + sc_shake_y, 100, 75]
-    pygame.draw.rect(screen, (255, 0, 0), missile_hitbox) # 히트박스 그리기
+    # 히트박스 그리기
+    pygame.draw.rect(screen, (255, 0, 0), missile_hitbox)
+    # 미사일(보스 공격) 그리기
     screen.blit(missile_img[missile_anim], (missile_x + sc_shake_x, missile_y + sc_shake_y))
 
-    # 플레이어 공격 그리기
+    # 플레이어 총알이 화면 밖으로 나가거나 보스에 맞아 없어질 공격 저장할 리스트
     remove_t = []
+    # 모들 플레이어 총알 확인
     for atk in player_attack:
+        # 보스 쪽으로 발사
         atk[0] += 20
+        # 화면에 보여질 위치 설정
         atk_rect = [atk[0] + sc_shake_x, atk[1] + sc_shake_y, 10, 10]
+        # 화면 밖으로 나갔다면 remove_t 리스트에 추가
         if atk[0] >= screen_w:
             remove_t.append(atk)
+        # 보스에 공격이 맞았다면 보스 체력 깍고 remove_t 에 추가
         elif collide(*atk_rect, *boss_hitbox):
             boss_hp -= 1
             remove_t.append(atk)
+        # 플레이어 공격 그리기
         pygame.draw.rect(screen, (0, 0, 255), atk_rect)
 
+    # remove_t에 있는 총알 player_attack에서 삭제
     for r in remove_t:
         player_attack.remove(r)
 
-    # 플레이어 그리기
+    # 히트박스 설정(슬라이딩 상태라면) 세로 길이를 반으로
     player_rect = [100 + sc_shake_x, player_y + (player_h / 2 if sliding and not jumping else 0) + sc_shake_y, player_w, player_h / (2 if sliding and not jumping  else 1)]
     if jumping or not sliding:
+        # 점프중이거나 걷는 상태라면 움직이는 모습으로 그리기
         screen.blit(player_walk_img[player_anim % 28], player_rect)
     else:
+        # 슬라이딩 중이라면 슬라이딩 하는 모습으로 그리기
         screen.blit(player_slide_img, player_rect)
-    # pygame.draw.rect(screen, (0, 0, 255), player_rect)
+
+    # 플레이어가 보스에 닿았거나, 미사일, 레이저에 닿았다면 게임 오버 처리
     if (collide(*player_rect, *boss_hitbox) or \
         collide(*player_rect, *missile_hitbox) or \
         (collide(*player_rect, *laser_hitbox) and laser_shot)) and \
@@ -333,12 +373,15 @@ while 1:
             pygame.draw.rect(screen, (255, 0, 0), obs_rect)
         else:
             screen.blit(obs_img[obs_t[i]], obs_rect)
+
+        # 플레이어가 장애물에 닿았다면 게임 오버 처리
         if collide(*player_rect, *obs_rect) and not game_over and (mode == "normal" or mode == "m boss appear"):
             bgm.stop()
             game_over = True
     
     # 점수 표시
     score_color = (0, 0, 0)
+    # 중간보스일 경우 색을 흰색으로
     if mode == "m boss":
         score_color = (255, 255, 255)
     scoretxt = font1.render('Score: ' + str(score), True, score_color)
@@ -352,6 +395,7 @@ while 1:
         scoretxt = font1.render('Boss', True, score_color)
         screen.blit(scoretxt, (screen_w / 2 - 300, 10))
 
+    # 화면 업데이트
     pygame.display.update()
 
 # 2초 기다리고 게임을 끈다.
