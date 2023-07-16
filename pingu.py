@@ -79,8 +79,11 @@ missile_anim = 0
 missile_fire = False
 missile_x, missile_y = 100 + screen_w, screen_h - floor_h - 150 - screen_w / 2
 mode = "normal"
+
+# 점수표시 등을 위한 폰트 불러오기
 font1 = pygame.font.SysFont('Sans', 30)
 
+# 게임오버 관련 변수
 game_over = False
 game_over_frame = 0
 
@@ -128,22 +131,29 @@ while 1:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
+        # 키를 누른 경우
         if event.type == pygame.KEYDOWN:
             if game_over and game_over_frame >= 60:
                 game_restart()
             else:
+                # 남은 점프 횟수가 있고
                 if jump_cnt > 0:
+                    # 위쪽 방향키/스페이스키를 눌렀다면 점프 하고 점프 횟수 한개 줄이기
                     if event.key == pygame.K_UP or event.key == pygame.K_SPACE:
                         gravity = 20
                         jumping = True
                         jump_cnt -= 1
                         jump_sound.play()
+                # 아래 방향키 눌렀다면 슬라이딩 중으로 바꾸기
                 if event.key == pygame.K_DOWN:
                     sliding = True
+                # 현재 중간보스이고, x키를 눌렀다면 총알 발사
                 if event.key == pygame.K_x and mode == "m boss" and attack_cool_frame <= 0:
                     player_attack.append([120, player_y + player_w / 2])
                     attack_cool_frame = 10
+        # 키를 뗀 경우
         if event.type == pygame.KEYUP:
+            # 아래 방향키를 뗐다면 슬라이딩 중을 아님으로 바꾸기
             if not game_over: 
                 if event.key == pygame.K_DOWN:
                     sliding = False
@@ -158,7 +168,7 @@ while 1:
             jump_cnt = 2
         gravity -= 1.2
 
-        # 플레이어 공격 쿨
+        # 플레이어 공격 쿨타임 확인
         attack_cool_frame -= 1        
     
         # 장애물 움직이기
@@ -173,7 +183,8 @@ while 1:
                     if score == m_boss_score:
                         mode = "m boss appear"
                         bgm.stop()
-                #obs_speed[i] = random.randint(5,20)
+        
+        # 플레이어 걷는 애니메이션 처리
         player_anim_frame += 1
         if player_anim_frame == 3:
             player_anim += 1
