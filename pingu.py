@@ -172,7 +172,7 @@ while 1:
         attack_cool_frame -= 1        
     
         # 장애물 움직이기
-        for i in range(3): 
+        for i in range(3):
             obs_x[i] -= obs_speed[i]
             if obs_x[i] + obs_w <= 0:
                 px = obs_x[i-1] + screen_w / 3 + random.randint(100, 300)
@@ -203,7 +203,7 @@ while 1:
                     mode = "m boss"
                     shake_frame = 30
                     boom_sound.play()
-                    m_boss_bgm.play()
+                    m_boss_bgm.play(-1)
         
         # 손으로 바닥 쿵 찍으면서 장애물 올라가고, 보스 나오는 부분
         if not hand_up:
