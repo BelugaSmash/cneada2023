@@ -270,6 +270,10 @@ while 1:
             else:
                 missile_x -= 40
                 missile_y += 20
+        if mode == 'm boss disappear':
+            hand_up = True
+            hand_y += 10
+            boss_y += 10
 
         # 화면 흔들기 효과 지속시간이 남았다면 sc_shake 변수 설정해 화면 흔들기(더 쎄게 흔들려면 -50, 50을 절댓값이 더 큰수로 바꾸면 됨)       
         if shake_frame > 0:
@@ -286,7 +290,7 @@ while 1:
     bg_color = (50, 150, 200)
     if mode == "normal" or mode == "m boss appear":
         screen.fill(bg_color)
-    elif mode == "m boss":
+    elif mode == "m boss" or mode == "m boss disappear":
         screen.blit(bg_img, (0,0))
      
     # 레이저 히트박스 설정
@@ -347,7 +351,8 @@ while 1:
             remove_t.append(atk)
         # 보스에 공격이 맞았다면 보스 체력 깍고 remove_t 에 추가
         elif collide(*atk_rect, *boss_hitbox):
-            boss_hp -= 1
+            if boss_attack != 1:
+                boss_hp -= 1
             remove_t.append(atk)
         # 플레이어 공격 그리기
         pygame.draw.rect(screen, (0, 0, 255), atk_rect)
@@ -355,6 +360,10 @@ while 1:
     # remove_t에 있는 총알 player_attack에서 삭제
     for r in remove_t:
         player_attack.remove(r)
+
+    if boss_hp <= 0:
+        boss_hp = 800
+        mode = 'm boss disappear'
 
     # 히트박스 설정(슬라이딩 상태라면) 세로 길이를 반으로
     player_rect = [100 + sc_shake_x, player_y + (player_h / 2 if sliding and not jumping else 0) + sc_shake_y, player_w, player_h / (2 if sliding and not jumping  else 1)]
