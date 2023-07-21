@@ -76,7 +76,8 @@ score = 0
 m_boss_score = 5
 boss_turn = 100
 boss_attack = 0
-boss_hp = 400
+boss_hp = 5
+boss_p = 50
 attack_frame = 0
 laser_shot = False
 missile_anim = 0
@@ -282,9 +283,27 @@ while 1:
             boss_y += 10
             if hand_y >= screen_h - floor_h - 34 + 300:
                 mode = 'f boss appear'
+                m_boss_bgm.stop()
 
         if mode == 'f boss appear':
-            player_x += 5
+            player_x += 4   
+            if hand_up:
+                hand_y -= 3
+                if hand_y <= screen_h - floor_h - 34 - 150:
+                    hand_up = False
+            else:
+                hand_y += 20
+                if hand_y >= screen_h - floor_h - 14:
+                    hand_y = screen_h - floor_h - 16
+                    mode = "f boss"
+                    shake_frame = 30
+                    boom_sound.play()
+                    m_boss_bgm.play(-1)
+
+        if mode == 'f boss':
+            player_x -= 20
+            if player_x <= 100:
+                player_x = 100
 
         if tuna_up:
             tuna_y -= 1
@@ -310,7 +329,7 @@ while 1:
     bg_color = (50, 150, 200)
     if mode == "normal" or mode == "m boss appear":
         screen.fill(bg_color)
-    elif mode == "m boss" or mode == "m boss disappear" or mode == "f boss appear":
+    elif mode == "m boss" or mode == "m boss disappear" or mode == "f boss appear" or mode == 'f boss':
         screen.blit(bg_img, (0,0))
     
     if hand_up:
@@ -335,7 +354,7 @@ while 1:
         screen.blit(laser_img, (810 - screen_w + 100 + sc_shake_x, screen_h - floor_h - 100 + sc_shake_y))
 
     # 참치 그리기
-    if mode == 'm boss disappear' or mode == 'f boss appear':
+    if mode == 'm boss disappear' or mode == 'f boss appear' or mode == 'f boss':
         screen.blit(tuna_img, (850, screen_h - floor_h - 200 + tuna_y))
 
     # 보스 공격 패턴에 따라 중간보스 그리기
