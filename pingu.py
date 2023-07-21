@@ -23,6 +23,7 @@ boss_attack_img = pygame.image.load("resource/boss_attack.png")
 obs_img = [0, pygame.image.load("resource/obstacle1.png"), pygame.image.load("resource/obstacle2.png"), None]
 laser_img = pygame.image.load("resource/laser.png")
 missile_img = [pygame.image.load(f"resource/missile{i}.png") for i in range(2)]
+tuna_img = pygame.image.load("resource/tuna.png")
 bg_img = pygame.image.load("resource/bg.png")
 
 floor_h = 200
@@ -49,6 +50,8 @@ boss_hand_x = [830, 1000]
 hand_y = screen_h - floor_h - 34 + 300
 boss_x, boss_y = 810, screen_h - floor_h
 hand_up = True
+tuna_y = -10
+tuna_up = False
 
 # 소리 관련 변수 설정
 bgm = pygame.mixer.Sound("resource/it's just burning memory.wav")
@@ -274,6 +277,17 @@ while 1:
             hand_up = True
             hand_y += 10
             boss_y += 10
+            if hand_y >= screen_h - floor_h - 34 + 300:
+                mode = 'f boss appear'
+
+        if tuna_up:
+            tuna_y -= 1
+            if tuna_y == -10:
+                tuna_up = False
+        else:
+            tuna_y += 1
+            if tuna_y == 10:
+                tuna_up = True
 
         # 화면 흔들기 효과 지속시간이 남았다면 sc_shake 변수 설정해 화면 흔들기(더 쎄게 흔들려면 -50, 50을 절댓값이 더 큰수로 바꾸면 됨)       
         if shake_frame > 0:
@@ -290,8 +304,18 @@ while 1:
     bg_color = (50, 150, 200)
     if mode == "normal" or mode == "m boss appear":
         screen.fill(bg_color)
-    elif mode == "m boss" or mode == "m boss disappear":
+    elif mode == "m boss" or mode == "m boss disappear" or mode == "f boss appear":
         screen.blit(bg_img, (0,0))
+    
+    if hand_up:
+        # 중간 보스 손 그리기
+        screen.blit(boss_hand[0], (boss_hand_x[0] + sc_shake_x, hand_y + sc_shake_y))
+        screen.blit(boss_hand[1], (boss_hand_x[1] + sc_shake_x, hand_y + sc_shake_y))
+    
+    # 보스 화면에 보여질 위치와 히트박스 설정
+    boss_rect = [boss_x + sc_shake_x, boss_y + sc_shake_y, 309, 800]
+    boss_hitbox = [boss_x + 100 + sc_shake_x, boss_y + 50  + sc_shake_y, 309 - 200, 750]
+    pygame.draw.rect(screen, (0, 255, 0), boss_hitbox)
      
     # 레이저 히트박스 설정
     laser_hitbox = [810 - screen_w + 100 + sc_shake_x, screen_h - floor_h - 75 + sc_shake_y, 1280, 50]
@@ -303,16 +327,10 @@ while 1:
     if laser_shot:
         # 레이저(보스 공격) 그리기
         screen.blit(laser_img, (810 - screen_w + 100 + sc_shake_x, screen_h - floor_h - 100 + sc_shake_y))
-    
-    if hand_up:
-        # 중간 보스 손 그리기
-        screen.blit(boss_hand[0], (boss_hand_x[0] + sc_shake_x, hand_y + sc_shake_y))
-        screen.blit(boss_hand[1], (boss_hand_x[1] + sc_shake_x, hand_y + sc_shake_y))
-    
-    # 보스 화면에 보여질 위치와 히트박스 설정
-    boss_rect = [boss_x + sc_shake_x, boss_y + sc_shake_y, 309, 800]
-    boss_hitbox = [boss_x + 100 + sc_shake_x, boss_y + 50  + sc_shake_y, 309 - 200, 750]
-    pygame.draw.rect(screen, (0, 255, 0), boss_hitbox)
+
+    # 참치 그리기
+    if mode == 'm boss disappear' or mode == 'f boss appear':
+        screen.blit(tuna_img, (850, screen_h - floor_h - 200 + tuna_y))
 
     # 보스 공격 패턴에 따라 중간보스 그리기
     if boss_attack == 0:
