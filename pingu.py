@@ -34,6 +34,7 @@ shake_frame = 0
 
 #플레이어 관련 변수 선언
 player_w, player_h = 55, 55
+player_x = 100
 player_y = screen_h - floor_h - player_h
 player_anim_frame = 0
 attack_cool_frame = 0
@@ -99,8 +100,9 @@ def collide(x, y, w, h, x_, y_, w_, h_):
 
 # 게임 시작할때 변수 선언
 def game_restart():
-    global player_y, gravity, sliding, jumping, jump_cnt, obs_x, obs_t, game_over, score, mode, hand_up, obs_y, sc_shake_x, sc_shake_y, shake_frame, \
+    global player_x, player_y, gravity, sliding, jumping, jump_cnt, obs_x, obs_t, game_over, score, mode, hand_up, obs_y, sc_shake_x, sc_shake_y, shake_frame, \
         hand_y, boss_y, boss_x, missile_x, missile_y, missile_fire, attack_frame, laser_shot, boss_attack, game_over_frame, boss_hp
+    player_x = 100
     player_y = opy
     gravity = 0 
     sliding = False
@@ -152,7 +154,7 @@ while 1:
                     sliding = True
                 # 현재 중간보스이고, x키를 눌렀다면 총알 발사
                 if event.key == pygame.K_x and mode == "m boss" and attack_cool_frame <= 0:
-                    player_attack.append([120, player_y + player_w / 2])
+                    player_attack.append([player_x + 20, player_y + player_w / 2])
                     attack_cool_frame = 10
         # 키를 뗀 경우
         if event.type == pygame.KEYUP:
@@ -273,12 +275,16 @@ while 1:
             else:
                 missile_x -= 40
                 missile_y += 20
+        
         if mode == 'm boss disappear':
             hand_up = True
             hand_y += 10
             boss_y += 10
             if hand_y >= screen_h - floor_h - 34 + 300:
                 mode = 'f boss appear'
+
+        if mode == 'f boss appear':
+            player_x += 5
 
         if tuna_up:
             tuna_y -= 1
@@ -381,10 +387,17 @@ while 1:
 
     if boss_hp <= 0:
         boss_hp = 800
-        mode = 'm boss disappear'
+        mode = "m boss disappear"
+        boss_attack = 0
+        attack_frame = 0
+        missile_fire = False
+        missile_x -= 1000
+        missile_y += 2000
+        laser_shot = False
+        boss_turn = 10 * 60
 
     # 히트박스 설정(슬라이딩 상태라면) 세로 길이를 반으로
-    player_rect = [100 + sc_shake_x, player_y + (player_h / 2 if sliding and not jumping else 0) + sc_shake_y, player_w, player_h / (2 if sliding and not jumping  else 1)]
+    player_rect = [player_x + sc_shake_x, player_y + (player_h / 2 if sliding and not jumping else 0) + sc_shake_y, player_w, player_h / (2 if sliding and not jumping  else 1)]
     if jumping or not sliding:
         # 점프중이거나 걷는 상태라면 움직이는 모습으로 그리기
         screen.blit(player_walk_img[player_anim % 28], player_rect)
