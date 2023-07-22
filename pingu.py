@@ -59,6 +59,8 @@ bgm = pygame.mixer.Sound("resource/it's just burning memory.wav")
 jump_sound = pygame.mixer.Sound("resource/juuuuuump.wav")
 boom_sound = pygame.mixer.Sound("resource/boom.wav")
 m_boss_bgm = pygame.mixer.Sound("resource/m_boss.mp3")
+m_boss_end_bgm = pygame.mixer.Sound("resource/peaceful.wav")
+f_boss_bgm = pygame.mixer.Sound("resource/f_boss.wav")
 jump_sound.set_volume(0.35)
 bgm.set_volume(1)
 m_boss_bgm.set_volume(0.7)
@@ -74,9 +76,10 @@ obs_speed = [8,8,8]
 # 스테이지 관련 변수 선언
 score = 0
 m_boss_score = 5
+m_boss_df = 0
 boss_turn = 100
 boss_attack = 0
-boss_hp = 400
+boss_hp = 5
 boss_p = 50
 attack_frame = 0
 laser_shot = False
@@ -102,7 +105,7 @@ def collide(x, y, w, h, x_, y_, w_, h_):
 # 게임 시작할때 변수 선언
 def game_restart():
     global player_x, player_y, gravity, sliding, jumping, jump_cnt, obs_x, obs_t, game_over, score, mode, hand_up, obs_y, sc_shake_x, sc_shake_y, shake_frame, \
-        hand_y, boss_y, boss_x, missile_x, missile_y, missile_fire, attack_frame, laser_shot, boss_attack, game_over_frame, boss_hp
+        hand_y, boss_y, boss_x, missile_x, missile_y, missile_fire, attack_frame, laser_shot, boss_attack, game_over_frame, boss_hp, m_boss_df
     player_x = 100
     player_y = opy
     gravity = 0 
@@ -114,6 +117,7 @@ def game_restart():
     score = 0
     hand_y = screen_h - floor_h - 34 + 300
     boss_x, boss_y = 810, screen_h - floor_h
+    m_boss_df = 0
     boss_attack = 0
     missile_x, missile_y = 100 + screen_w, screen_h - floor_h - 150 - screen_w / 2
     missile_fire = False
@@ -279,11 +283,12 @@ while 1:
         
         if mode == 'm boss disappear':
             hand_up = True
-            hand_y += 10
-            boss_y += 10
-            if hand_y >= screen_h - floor_h - 34 + 300:
+            m_boss_df += 1
+            if not hand_y >= screen_h - floor_h - 34 + 300:
+                hand_y += 10
+                boss_y += 10
+            if m_boss_df >= 5 * 60:
                 mode = 'f boss appear'
-                m_boss_bgm.stop()
 
         if mode == 'f boss appear':
             player_x += 4   
@@ -297,8 +302,9 @@ while 1:
                     hand_y = screen_h - floor_h - 16
                     mode = "f boss"
                     shake_frame = 30
+                    m_boss_end_bgm.stop()
                     boom_sound.play()
-                    m_boss_bgm.play(-1)
+                    f_boss_bgm.play(-1)
 
         if mode == 'f boss':
             player_x -= 20
@@ -404,7 +410,9 @@ while 1:
     for r in remove_t:
         player_attack.remove(r)
 
-    if boss_hp <= 0:
+    if mode == 'm boss' and boss_hp <= 0:
+        m_boss_bgm.stop()
+        m_boss_end_bgm.play()
         boss_hp = 800
         mode = "m boss disappear"
         boss_attack = 0
