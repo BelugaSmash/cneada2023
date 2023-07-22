@@ -58,12 +58,12 @@ tuna_up = False
 bgm = pygame.mixer.Sound("resource/it's just burning memory.wav")
 jump_sound = pygame.mixer.Sound("resource/juuuuuump.wav")
 boom_sound = pygame.mixer.Sound("resource/boom.wav")
-m_boss_bgm = pygame.mixer.Sound("resource/m_boss.mp3")
+m_boss_bgm = pygame.mixer.Sound("resource/m_boss.wav")
 m_boss_end_bgm = pygame.mixer.Sound("resource/peaceful.wav")
-f_boss_bgm = pygame.mixer.Sound("resource/f_boss.wav")
+f_boss_bgm = pygame.mixer.Sound("resource/f_boss.mp3")
 jump_sound.set_volume(0.35)
 bgm.set_volume(1)
-m_boss_bgm.set_volume(0.7)
+m_boss_bgm.set_volume(0.4)
 bgm.play(-1)
 
 # 장애물 변수 선언
@@ -79,7 +79,7 @@ m_boss_score = 5
 m_boss_df = 0
 boss_turn = 100
 boss_attack = 0
-boss_hp = 5
+boss_hp = 400
 boss_p = 50
 attack_frame = 0
 laser_shot = False
@@ -133,6 +133,7 @@ def game_restart():
     game_over = False
     bgm.play()
     m_boss_bgm.stop()
+    f_boss_bgm.stop()
 
 while 1:
     # FPS를 60으로 설정
@@ -158,7 +159,7 @@ while 1:
                 if event.key == pygame.K_DOWN:
                     sliding = True
                 # 현재 중간보스이고, x키를 눌렀다면 총알 발사
-                if event.key == pygame.K_x and mode == "m boss" and attack_cool_frame <= 0:
+                if event.key == pygame.K_x and (mode == "m boss" or mode == "f boss") and attack_cool_frame <= 0:
                     player_attack.append([player_x + 20, player_y + player_w / 2])
                     attack_cool_frame = 10
         # 키를 뗀 경우
@@ -469,6 +470,12 @@ while 1:
     if mode == 'm boss':
         pygame.draw.rect(screen, (200, 200, 200), [screen_w / 2 - 202, 18, 404, 24])
         pygame.draw.rect(screen, (200, 50, 70), [screen_w / 2 - 200, 20, boss_hp, 20])
+        score_color = (200, 50, 70)
+        scoretxt = font1.render('Boss', True, score_color)
+        screen.blit(scoretxt, (screen_w / 2 - 300, 10))
+    if mode == 'f boss':
+        pygame.draw.rect(screen, (200, 200, 200), [screen_w / 2 - 202, 18, 404, 24])
+        pygame.draw.rect(screen, (200, 50, 70), [screen_w / 2 - 200, 20, boss_hp / 2, 20])
         score_color = (200, 50, 70)
         scoretxt = font1.render('Boss', True, score_color)
         screen.blit(scoretxt, (screen_w / 2 - 300, 10))
