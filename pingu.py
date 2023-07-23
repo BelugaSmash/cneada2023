@@ -25,7 +25,7 @@ laser_img = pygame.image.load("resource/laser.png")
 missile_img = [pygame.image.load(f"resource/missile{i}.png") for i in range(2)]
 tuna_img = pygame.image.load("resource/tuna.png")
 floor_img = pygame.image.load("resource/floor.png")
-bg_img = [pygame.image.load(f"resource/bg{i + 1}.png") for i in range(2)]
+bg_img = [pygame.image.load(f"resource/bg{i + 1}.png").convert() for i in range(2)]
 
 floor_h = 200
 
