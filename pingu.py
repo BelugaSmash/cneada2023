@@ -24,7 +24,8 @@ obs_img = [0, pygame.image.load("resource/obstacle1.png"), pygame.image.load("re
 laser_img = pygame.image.load("resource/laser.png")
 missile_img = [pygame.image.load(f"resource/missile{i}.png") for i in range(2)]
 tuna_img = pygame.image.load("resource/tuna.png")
-bg_img = pygame.image.load("resource/bg.png")
+floor_img = pygame.image.load("resource/floor.png")
+bg_img = [pygame.image.load(f"resource/bg{i + 1}.png") for i in range(2)]
 
 floor_h = 200
 
@@ -86,6 +87,8 @@ laser_shot = False
 missile_anim = 0
 missile_fire = False
 missile_x, missile_y = 100 + screen_w, screen_h - floor_h - 150 - screen_w / 2
+floor_x = 0
+floor_speed = 8
 mode = "normal"
 
 # 점수표시 등을 위한 폰트 불러오기
@@ -178,6 +181,8 @@ while 1:
             jumping = False
             jump_cnt = 2
         gravity -= 1.2
+
+        floor_x -= floor_speed
 
         # 플레이어 공격 쿨타임 확인
         attack_cool_frame -= 1        
@@ -333,11 +338,10 @@ while 1:
         game_over_frame += 1
     
     # 화면(배경) 채우기
-    bg_color = (50, 150, 200)
-    if mode == "normal" or mode == "m boss appear":
-        screen.fill(bg_color)
-    elif mode == "m boss" or mode == "m boss disappear" or mode == "f boss appear" or mode == 'f boss':
-        screen.blit(bg_img, (0,0))
+    bg_idx = 0
+    if mode == "m boss" or mode == "m boss disappear" or mode == "f boss appear" or mode == 'f boss':
+        bg_idx = 1
+    screen.blit(bg_img[bg_idx], (0,0))
     
     if hand_up:
         # 중간 보스 손 그리기
@@ -373,9 +377,8 @@ while 1:
         screen.blit(boss_img if not laser_shot else boss_attack_img, boss_rect)
     
     # 바닥 그리기
-    pygame.draw.rect(screen, (100, 70, 70), [0 + sc_shake_x, screen_h - floor_h + sc_shake_y, screen_w, floor_h * 2])
-    pygame.draw.rect(screen, (0, 200, 0), [0 + sc_shake_x, screen_h - floor_h + sc_shake_y, screen_w, 30])
-
+    screen.blit(floor_img, (floor_x % (screen_w * 2) - screen_w + sc_shake_x, screen_h - floor_h - 50 + sc_shake_y))
+    screen.blit(floor_img, (((floor_x + screen_w) % (screen_w * 2) - screen_w + sc_shake_x, screen_h - floor_h - 50 + sc_shake_y)))
     if not hand_up:
         # 중간 보스 손 그리기
         screen.blit(boss_hand[0], (boss_hand_x[0] + sc_shake_x, hand_y + sc_shake_y))
@@ -461,7 +464,7 @@ while 1:
     # 점수 표시
     score_color = (0, 0, 0)
     # 중간보스일 경우 색을 흰색으로
-    if mode == "m boss":
+    if mode == "m boss" or mode == "m boss disappear" or mode == 'f boss appear' or mode == 'f boss':
         score_color = (255, 255, 255)
     scoretxt = font1.render('Score: ' + str(score), True, score_color)
     screen.blit(scoretxt, (10, 10))
