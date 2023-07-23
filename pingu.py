@@ -37,6 +37,9 @@ shake_frame = 0
 player_w, player_h = 55, 55
 player_x = 100
 player_y = screen_h - floor_h - player_h
+player_speed = 5
+player_pushed = False
+move_x = 0
 player_anim_frame = 0
 attack_cool_frame = 0
 player_attack = []
@@ -90,6 +93,7 @@ missile_x, missile_y = 100 + screen_w, screen_h - floor_h - 150 - screen_w / 2
 floor_x = 0
 floor_speed = 8
 mode = "normal"
+pressed_key = []
 
 # 점수표시 등을 위한 폰트 불러오기
 font1 = pygame.font.SysFont('Sans', 30)
@@ -108,13 +112,14 @@ def collide(x, y, w, h, x_, y_, w_, h_):
 # 게임 시작할때 변수 선언
 def game_restart():
     global player_x, player_y, gravity, sliding, jumping, jump_cnt, obs_x, obs_t, game_over, score, mode, hand_up, obs_y, sc_shake_x, sc_shake_y, shake_frame, \
-        hand_y, boss_y, boss_x, missile_x, missile_y, missile_fire, attack_frame, laser_shot, boss_attack, game_over_frame, boss_hp, m_boss_df
+        hand_y, boss_y, boss_x, missile_x, missile_y, missile_fire, attack_frame, laser_shot, boss_attack, game_over_frame, boss_hp, m_boss_df, player_pushed
     player_x = 100
     player_y = opy
     gravity = 0 
     sliding = False
     jumping = False
     hand_up = True
+    player_pushed = False
     obs_y = 0
     jump_cnt = 2
     score = 0
@@ -141,14 +146,16 @@ def game_restart():
 while 1:
     # FPS를 60으로 설정
     clock.tick(60)
+
     # 파이게임 기본 코드
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
         # 키를 누른 경우
         if event.type == pygame.KEYDOWN:
-            if game_over and game_over_frame >= 60:
-                game_restart()
+            if game_over:
+                if game_over_frame >= 60:
+                    game_restart()
             else:
                 # 남은 점프 횟수가 있고
                 if jump_cnt > 0:
@@ -165,12 +172,20 @@ while 1:
                 if event.key == pygame.K_x and (mode == "m boss" or mode == "f boss") and attack_cool_frame <= 0:
                     player_attack.append([player_x + 20, player_y + player_w / 2])
                     attack_cool_frame = 10
+                if event.key == pygame.K_LEFT:
+                    pressed_key.append("left")
+                if event.key == pygame.K_RIGHT:
+                    pressed_key.append("right")
         # 키를 뗀 경우
         if event.type == pygame.KEYUP:
             # 아래 방향키를 뗐다면 슬라이딩 중을 아님으로 바꾸기
             if not game_over: 
                 if event.key == pygame.K_DOWN:
                     sliding = False
+                if event.key == pygame.K_LEFT:
+                    pressed_key.remove("left")
+                if event.key == pygame.K_RIGHT:
+                    pressed_key.remove("right")
 
     # 게임 오버가 아니라면
     if not game_over:
@@ -181,6 +196,8 @@ while 1:
             jumping = False
             jump_cnt = 2
         gravity -= 1.2
+
+        move_x = (player_speed if "right" in pressed_key else 0) + (-player_speed if "left" in pressed_key else 0)
 
         floor_x -= floor_speed
 
@@ -313,9 +330,17 @@ while 1:
                     f_boss_bgm.play(-1)
 
         if mode == 'f boss':
-            player_x -= 20
-            if player_x <= 100:
-                player_x = 100
+            if not player_pushed:
+                player_x -= 20
+                if player_x <= 100:
+                    player_pushed = True
+                    player_x = 100
+            else:
+                player_x += move_x
+                if player_x <= 0:
+                    player_x = 0
+                elif player_x + player_w >= screen_w:
+                    player_x = screen_w - player_w
 
         if tuna_up:
             tuna_y -= 1
