@@ -1,6 +1,7 @@
 import pygame
 import sys
 import os
+import math
 import random
 
 # 파이게임 초기화
@@ -24,7 +25,7 @@ obs_img = [0] + [pygame.image.load(f"resource/obstacle{i + 1}.png") for i in ran
 laser_img = pygame.image.load("resource/laser.png")
 missile_img = [pygame.image.load(f"resource/missile{i}.png") for i in range(2)]
 tuna_img = pygame.image.load("resource/tuna.png")
-floor_img = pygame.image.load("resource/floor.png")
+floor_img = [pygame.image.load("resource/floor.png"), pygame.image.load("resource/floor2.png")]
 bg_img = [pygame.image.load(f"resource/bg{i + 1}.png").convert() for i in range(2)]
 
 floor_h = 200
@@ -49,6 +50,7 @@ gravity = 0
 sliding = False 
 jumping = False
 jump_cnt = 2
+bullet_speed = 20
 
 # 보스 관련 변수 선언
 boss_hand_x = [830, 1000]
@@ -151,6 +153,22 @@ while 1:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
+        
+        # 마우스를 누른 경우        
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if game_over:
+                if game_over_frame >= 60:
+                    game_restart()
+            else:
+                mouse_pos = pygame.mouse.get_pos()
+                if (mode == "m boss" or mode == "f boss") and attack_cool_frame <= 0:
+                    distance = math.sqrt((player_x + 20 - mouse_pos[0]) ** 2 + (player_y + player_w / 2 - mouse_pos[1]) ** 2)
+                    direction = (mouse_pos[0] - player_x - 20, mouse_pos[1] - player_y - player_h / 2)
+                    normalized = (direction[0] / distance, direction[1] / distance)
+                    move_vector = (normalized[0] * bullet_speed, normalized[1] * bullet_speed)
+                    player_attack.append([player_x + 20, player_y + player_h / 2, move_vector])
+                    attack_cool_frame = 10
+        
         # 키를 누른 경우
         if event.type == pygame.KEYDOWN:
             if game_over:
@@ -160,31 +178,31 @@ while 1:
                 # 남은 점프 횟수가 있고
                 if jump_cnt > 0:
                     # 위쪽 방향키/스페이스키를 눌렀다면 점프 하고 점프 횟수 한개 줄이기
-                    if event.key == pygame.K_UP or event.key == pygame.K_SPACE:
+                    if event.key == pygame.K_SPACE or event.key == pygame.K_w:
                         gravity = 20
                         jumping = True
                         jump_cnt -= 1
                         jump_sound.play()
                 # 아래 방향키 눌렀다면 슬라이딩 중으로 바꾸기
-                if event.key == pygame.K_DOWN:
+                if event.key == pygame.K_s:
                     sliding = True
                 # 현재 중간보스이고, x키를 눌렀다면 총알 발사
                 if event.key == pygame.K_x and (mode == "m boss" or mode == "f boss") and attack_cool_frame <= 0:
                     player_attack.append([player_x + 20, player_y + player_w / 2])
                     attack_cool_frame = 10
-                if event.key == pygame.K_LEFT:
+                if event.key == pygame.K_a:
                     pressed_key.append("left")
-                if event.key == pygame.K_RIGHT:
+                if event.key == pygame.K_d:
                     pressed_key.append("right")
         # 키를 뗀 경우
         if event.type == pygame.KEYUP:
             # 아래 방향키를 뗐다면 슬라이딩 중을 아님으로 바꾸기
-            if not game_over: 
-                if event.key == pygame.K_DOWN:
+            if not game_over:
+                if event.key == pygame.K_s:
                     sliding = False
-                if event.key == pygame.K_LEFT:
+                if event.key == pygame.K_a:
                     pressed_key.remove("left")
-                if event.key == pygame.K_RIGHT:
+                if event.key == pygame.K_d:
                     pressed_key.remove("right")
 
     # 게임 오버가 아니라면
@@ -402,8 +420,9 @@ while 1:
         screen.blit(boss_img if not laser_shot else boss_attack_img, boss_rect)
     
     # 바닥 그리기
-    screen.blit(floor_img, (floor_x % (screen_w * 2) - screen_w + sc_shake_x, screen_h - floor_h - 50 + sc_shake_y))
-    screen.blit(floor_img, (((floor_x + screen_w) % (screen_w * 2) - screen_w + sc_shake_x, screen_h - floor_h - 50 + sc_shake_y)))
+    floor_idx = bg_idx
+    screen.blit(floor_img[floor_idx], (floor_x % (screen_w * 2) - screen_w + sc_shake_x, screen_h - floor_h - 50 + sc_shake_y))
+    screen.blit(floor_img[floor_idx], (((floor_x + screen_w) % (screen_w * 2) - screen_w + sc_shake_x, screen_h - floor_h - 50 + sc_shake_y)))
     if not hand_up:
         # 중간 보스 손 그리기
         screen.blit(boss_hand[0], (boss_hand_x[0] + sc_shake_x, hand_y + sc_shake_y))
@@ -421,7 +440,8 @@ while 1:
     # 모들 플레이어 총알 확인
     for atk in player_attack:
         # 보스 쪽으로 발사
-        atk[0] += 20
+        atk[0] += atk[2][0]
+        atk[1] += atk[2][1]
         # 화면에 보여질 위치 설정
         atk_rect = [atk[0] + sc_shake_x, atk[1] + sc_shake_y, 10, 10]
         # 화면 밖으로 나갔다면 remove_t 리스트에 추가
