@@ -28,6 +28,7 @@ tuna_img = pygame.image.load("resource/tuna.png")
 spike_img = pygame.image.load("resource/spike.png")
 floor_img = [pygame.image.load("resource/floor.png"), pygame.image.load("resource/floor2.png")]
 bg_img = [pygame.image.load(f"resource/bg{i + 1}.png").convert() for i in range(2)]
+game_over_img = pygame.image.load(f"resource/gameover.png")
 
 floor_h = 200
 
@@ -64,6 +65,7 @@ tuna_up = False
 # 소리 관련 변수 설정
 bgm = pygame.mixer.Sound("resource/it's just burning memory.wav")
 jump_sound = pygame.mixer.Sound("resource/juuuuuump.wav")
+game_over_sound = pygame.mixer.Sound("resource/121Nootnoot.mp3")
 boom_sound = pygame.mixer.Sound("resource/boom.wav")
 m_boss_bgm = pygame.mixer.Sound("resource/m_boss.wav")
 m_boss_end_bgm = pygame.mixer.Sound("resource/peaceful.wav")
@@ -149,6 +151,7 @@ def game_restart():
     bgm.play()
     m_boss_bgm.stop()
     f_boss_bgm.stop()
+    game_over_sound.stop()
 
 while 1:
     # FPS를 60으로 설정
@@ -543,6 +546,10 @@ while 1:
         (collide(*player_rect, *spike_hitbox) and spike_up)) and \
         not game_over:
         bgm.stop()
+        f_boss_bgm.stop()
+        m_boss_bgm.stop()
+        m_boss_end_bgm.stop()
+        game_over_sound.play()
         game_over = True
     
     # 장애물 그리기
@@ -561,6 +568,11 @@ while 1:
         if collide(*player_rect, *obs_rect) and not game_over and (mode == "normal" or mode == "m boss appear"):
             bgm.stop()
             game_over = True
+            bgm.stop()
+            f_boss_bgm.stop()
+            m_boss_bgm.stop()
+            m_boss_end_bgm.stop()
+            game_over_sound.play()
     
     # 점수 표시
     score_color = (0, 0, 0)
@@ -583,6 +595,9 @@ while 1:
         score_color = (200, 50, 70)
         scoretxt = font1.render('Boss', True, score_color)
         screen.blit(scoretxt, (screen_w / 2 - 300, 10))
+
+    if game_over:
+        screen.blit(game_over_img, (0, 0))
 
     # 화면 업데이트
     pygame.display.update()
