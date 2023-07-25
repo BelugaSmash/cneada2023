@@ -473,6 +473,7 @@ while 1:
     
     # 바닥 그리기
     floor_idx = bg_idx
+    pygame.draw.rect(screen, (0, 0, 0), [0, screen_h - floor_h + 50, 1280, floor_h - 50])
     screen.blit(floor_img[floor_idx], (floor_x % (screen_w * 2) - screen_w + sc_shake_x, screen_h - floor_h - 50 + sc_shake_y))
     screen.blit(floor_img[floor_idx], (((floor_x + screen_w) % (screen_w * 2) - screen_w + sc_shake_x, screen_h - floor_h - 50 + sc_shake_y)))
 
