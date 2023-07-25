@@ -344,6 +344,7 @@ while 1:
             if attack_frame == 0:
                 boss_attack = 0
 
+        # 가시 올라오고 내려가게
         if spike_up:
             spike_y -= 20
             if spike_y <= screen_h - floor_h - 60:
@@ -447,7 +448,7 @@ while 1:
         # 레이저(보스 공격) 그리기
         screen.blit(laser_img, (810 - screen_w + 100 + sc_shake_x, screen_h - floor_h - 100 + sc_shake_y))
 
-    
+    # 최종보스패턴(가시)
     spike_hitbox = [spike_x + sc_shake_x, spike_y + sc_shake_y, 500, 80]
     spike_warn = [spike_x + sc_shake_x, screen_h - floor_h - 60 + sc_shake_y, 500, 80]
     # 가시 올라오기전
