@@ -293,11 +293,14 @@ while 1:
             if boss_turn <= 0:
                 # 얼마나 뒤에 보스 공격을 한번 더할껀지
                 boss_turn = 60 * 6
-                # 공격 패턴 정하기(중간보스: 1~3번, 최종보스 4~4번)
-                boss_attack = random.randint(4, 4)
+                # 공격 패턴 정하기(중간보스: 1~3번, 최종보스 4~5번)
+                boss_attack = random.randint(4, 5)
                 # 4번 패턴이면 화면 흔들고
                 if boss_attack == 4:
                     attack_frame = 160
+                elif boss_attack == 5:
+                    shake_frame = 10
+                    attack_frame = 100
 
         # 1번 패턴이면 화면 흔드는 동알 빨리 이동, 화면 안흔들릴시 천천히 이동하고 제자리 돌아오면 공격 끝내기
         if boss_attack == 1:
@@ -345,6 +348,12 @@ while 1:
                 if spike_up:
                     shake_frame = 10
             if attack_frame == 0:
+                boss_attack = 0
+        
+        if boss_attack == 5:
+            attack_frame -= 1
+            move_x += 10
+            if attack_frame <= 0:
                 boss_attack = 0
 
         # 가시 올라오고 내려가게
@@ -470,7 +479,7 @@ while 1:
     # 보스 공격 패턴에 따라 중간보스 그리기
     if boss_attack == 0:
         screen.blit(boss_img, boss_rect)
-    elif boss_attack == 1 or boss_attack == 2:
+    elif boss_attack == 1 or boss_attack == 2 or boss_attack == 5:
         screen.blit(boss_attack_img, boss_rect)
     elif boss_attack == 3 or boss_attack == 4:
         screen.blit(boss_img if not laser_shot and not spike_up else boss_attack_img, boss_rect)
