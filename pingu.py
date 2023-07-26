@@ -24,6 +24,7 @@ boss_attack_img = pygame.image.load("resource/boss_attack.png")
 obs_img = [0] + [pygame.image.load(f"resource/obstacle{i + 1}.png") for i in range(3)]
 laser_img = pygame.image.load("resource/laser.png")
 missile_img = [pygame.image.load(f"resource/missile{i}.png") for i in range(2)]
+lightning_img = [pygame.image.load(f"resource/lightning/lightning_{i}.png") for i in range(6)]
 tuna_img = pygame.image.load("resource/tuna.png")
 spike_img = pygame.image.load("resource/spike.png")
 floor_img = [pygame.image.load("resource/floor.png"), pygame.image.load("resource/floor2.png")]
@@ -88,7 +89,7 @@ m_boss_score = 5
 m_boss_df = 0
 boss_turn = 100
 boss_attack = 0
-boss_hp = 10
+boss_hp = 400
 boss_p = 50
 attack_frame = 0
 laser_shot = False
@@ -447,7 +448,7 @@ while 1:
     # 보스 화면에 보여질 위치와 히트박스 설정
     boss_rect = [boss_x + sc_shake_x, boss_y + sc_shake_y, 309, 800]
     boss_hitbox = [boss_x + 100 + sc_shake_x, boss_y + 50  + sc_shake_y, 309 - 200, 750]
-    pygame.draw.rect(screen, (0, 255, 0), boss_hitbox)
+    #히트박스 그리기#pygame.draw.rect(screen, (0, 255, 0), boss_hitbox)
      
     # 레이저 히트박스 설정
     laser_hitbox = [810 - screen_w + 100 + sc_shake_x, screen_h - floor_h - 75 + sc_shake_y, 1280, 50]
@@ -498,7 +499,7 @@ while 1:
     # 미사일 히트박스 설정
     missile_hitbox = [missile_x + 20 + sc_shake_x, missile_y + 75 + sc_shake_y, 100, 75]
     # 히트박스 그리기
-    pygame.draw.rect(screen, (255, 0, 0), missile_hitbox)
+    #히트박스 그리기#pygame.draw.rect(screen, (255, 0, 0), missile_hitbox)
     # 미사일(보스 공격) 그리기
     screen.blit(missile_img[missile_anim], (missile_x + sc_shake_x, missile_y + sc_shake_y))
 
