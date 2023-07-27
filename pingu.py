@@ -200,20 +200,20 @@ while 1:
                 # 아래 방향키 눌렀다면 슬라이딩 중으로 바꾸기
                 if event.key == pygame.K_s:
                     sliding = True
-                if event.key == pygame.K_a:
-                    pressed_key.append("left")
-                if event.key == pygame.K_d:
-                    pressed_key.append("right")
+            if event.key == pygame.K_a:
+                pressed_key.append("left")
+            if event.key == pygame.K_d:
+                pressed_key.append("right")
         # 키를 뗀 경우
         if event.type == pygame.KEYUP:
             # 아래 방향키를 뗐다면 슬라이딩 중을 아님으로 바꾸기
             if not game_over:
                 if event.key == pygame.K_s:
                     sliding = False
-                if event.key == pygame.K_a:
-                    pressed_key.remove("left")
-                if event.key == pygame.K_d:
-                    pressed_key.remove("right")
+            if event.key == pygame.K_a:
+                pressed_key.remove("left")
+            if event.key == pygame.K_d:
+                pressed_key.remove("right")
 
     # 게임 오버가 아니라면
     if not game_over:
