@@ -371,7 +371,7 @@ while 1:
             if attack_frame <= 0:
                 boss_attack = 0
         
-        # 6번 패턴일때 40 프레임마다 번갈아가며 레이저 껐다 켰다
+        # 6번 패턴일때 번개 3번 내리치기
         if boss_attack == 6:
             attack_frame -= 1
             if attack_frame in [18*3 + 30*2, 18*2 + 30*1, 18]:
