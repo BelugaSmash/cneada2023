@@ -595,7 +595,7 @@ while 1:
         collide(*player_rect, *missile_hitbox) or \
         (collide(*player_rect, *laser_hitbox) and laser_shot) or \
         (collide(*player_rect, *spike_hitbox) and spike_up) or \
-        (collide(*player_rect, *lightning_hitbox) and lightning)) and \
+        (collide(*player_rect, *lightning_hitbox) and lightning) and lightning_anim >= 1) and \
         not game_over:
         bgm.stop()
         f_boss_bgm.stop()
