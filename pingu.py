@@ -89,11 +89,15 @@ m_boss_score = 5
 m_boss_df = 0
 boss_turn = 100
 boss_attack = 0
-boss_hp = 400
+boss_hp = 10
 boss_p = 50
 attack_frame = 0
 laser_shot = False
 spike_up = False
+lightning = False
+lightning_frame = 0
+lightning_anim = 0
+lightning_x = 0
 spike_x, spike_y = 0, 0
 missile_anim = 0
 missile_fire = False
@@ -121,7 +125,7 @@ def collide(x, y, w, h, x_, y_, w_, h_):
 def game_restart():
     global player_x, player_y, gravity, sliding, jumping, jump_cnt, obs_x, obs_t, game_over, score, mode, hand_up, obs_y, sc_shake_x, sc_shake_y, shake_frame, \
         hand_y, boss_y, boss_x, missile_x, missile_y, missile_fire, attack_frame, laser_shot, boss_attack, game_over_frame, boss_hp, m_boss_df, player_pushed, \
-        spike_up
+        spike_up, lightning
     player_x = 100
     player_y = opy
     gravity = 0 
@@ -140,6 +144,7 @@ def game_restart():
     missile_fire = False
     laser_shot = False
     spike_up = False
+    lightning = False
     sc_shake_x = sc_shake_y = 0
     shake_frame = 0
     attack_frame = 0
@@ -249,6 +254,11 @@ while 1:
         if player_anim_frame == 3:
             player_anim += 1
             player_anim_frame = 0
+
+        lightning_frame += 1
+        if lightning_frame == 3:
+            lightning_anim += 1
+            lightning_frame = 0
         
         # 중간보스 등장
         if mode == "m boss appear":
@@ -295,13 +305,16 @@ while 1:
                 # 얼마나 뒤에 보스 공격을 한번 더할껀지
                 boss_turn = 60 * 6
                 # 공격 패턴 정하기(중간보스: 1~3번, 최종보스 4~5번)
-                boss_attack = random.randint(4, 5)
+                boss_attack = random.randint(4, 6)
                 # 4번 패턴이면 화면 흔들고
                 if boss_attack == 4:
                     attack_frame = 160
                 elif boss_attack == 5:
                     shake_frame = 10
                     attack_frame = 100
+                if boss_attack == 6:
+                    attack_frame = 18*3 + 30*3
+                    lightning_x = player_x - 100
 
         # 1번 패턴이면 화면 흔드는 동알 빨리 이동, 화면 안흔들릴시 천천히 이동하고 제자리 돌아오면 공격 끝내기
         if boss_attack == 1:
@@ -354,8 +367,25 @@ while 1:
         if boss_attack == 5:
             attack_frame -= 1
             move_x += 10
+            gravity -= 5
             if attack_frame <= 0:
                 boss_attack = 0
+        
+        # 6번 패턴일때 40 프레임마다 번갈아가며 레이저 껐다 켰다
+        if boss_attack == 6:
+            attack_frame -= 1
+            if attack_frame in [18*3 + 30*2, 18*2 + 30*1, 18]:
+                lightning = True
+                lightning_anim = 0
+                shake_frame = 10
+            elif attack_frame in [18*2 + 30*2, 18*1 + 30*1, 0]:
+                lightning = False
+                lightning_x = player_x - 100
+            
+            if attack_frame == 0:
+                boss_attack = 5
+                shake_frame = 10
+                attack_frame = 100
 
         # 가시 올라오고 내려가게
         if spike_up:
@@ -460,6 +490,17 @@ while 1:
     if laser_shot:
         # 레이저(보스 공격) 그리기
         screen.blit(laser_img, (810 - screen_w + 100 + sc_shake_x, screen_h - floor_h - 100 + sc_shake_y))
+    
+    # 번개 히트박스 설정
+    lightning_hitbox = [lightning_x + 85 + sc_shake_x, 0 + sc_shake_y, 80, 720]
+    # 번개 치기 전이라면
+    if boss_attack == 6 and not lightning and (attack_frame // 5) % 2 == 0:
+        # 번개 경고 표시 그리기
+        pygame.draw.rect(screen, (200, 50, 50), lightning_hitbox)
+    # 번개 치는중이라면
+    if lightning:
+        # 번개(보스 공격) 그리기
+        screen.blit(lightning_img[lightning_anim % 6], (lightning_x + sc_shake_x, -200 + sc_shake_y))
 
     # 최종보스패턴(가시)
     spike_hitbox = [spike_x + sc_shake_x, spike_y + sc_shake_y, 500, 80]
@@ -478,7 +519,7 @@ while 1:
         screen.blit(tuna_img, (850, screen_h - floor_h - 200 + tuna_y))
 
     # 보스 공격 패턴에 따라 중간보스 그리기
-    if boss_attack == 0:
+    if boss_attack == 0 or boss_attack == 6:
         screen.blit(boss_img, boss_rect)
     elif boss_attack == 1 or boss_attack == 2 or boss_attack == 5:
         screen.blit(boss_attack_img, boss_rect)
@@ -517,7 +558,7 @@ while 1:
             remove_t.append(atk)
         # 보스에 공격이 맞았다면 보스 체력 깍고 remove_t 에 추가
         elif collide(*atk_rect, *boss_hitbox):
-            if boss_attack != 1:
+            if boss_attack != 1 and not game_over:
                 boss_hp -= 1
             remove_t.append(atk)
         # 플레이어 공격 그리기
@@ -553,7 +594,8 @@ while 1:
     if (collide(*player_rect, *boss_hitbox) or \
         collide(*player_rect, *missile_hitbox) or \
         (collide(*player_rect, *laser_hitbox) and laser_shot) or \
-        (collide(*player_rect, *spike_hitbox) and spike_up)) and \
+        (collide(*player_rect, *spike_hitbox) and spike_up) or \
+        (collide(*player_rect, *lightning_hitbox) and lightning)) and \
         not game_over:
         bgm.stop()
         f_boss_bgm.stop()
