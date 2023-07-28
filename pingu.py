@@ -680,7 +680,7 @@ while 1:
         screen.blit(bg_img[0], (0, 0))
         screen.blit(floor_img[0], (floor_x % (screen_w * 2) - screen_w + sc_shake_x, screen_h - floor_h - 50 + sc_shake_y))
         screen.blit(floor_img[0], (((floor_x + screen_w) % (screen_w * 2) - screen_w + sc_shake_x, screen_h - floor_h - 50 + sc_shake_y)))
-        screen.blit(title_img, (screen_w / 2 - 320, screen_h / 2 - 280))
+        screen.blit(title_img, (screen_w / 2 - 320, 20))
         screen.blit(gamestart_img, (screen_w / 2 - 150, 400))
 
     # 화면 업데이트
