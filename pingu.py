@@ -70,6 +70,7 @@ tuna_up = False
 
 # 소리 관련 변수 설정
 bgm = pygame.mixer.Sound("resource/it's just burning memory.wav")
+lobby_bgm = pygame.mixer.Sound("resource/waltz.mp3")
 jump_sound = pygame.mixer.Sound("resource/juuuuuump.wav")
 game_over_sound = pygame.mixer.Sound("resource/121Nootnoot.mp3")
 boom_sound = pygame.mixer.Sound("resource/boom.wav")
@@ -79,6 +80,7 @@ f_boss_bgm = pygame.mixer.Sound("resource/f_boss.wav")
 jump_sound.set_volume(0.35)
 bgm.set_volume(1)
 f_boss_bgm.set_volume(0.4)
+lobby_bgm.play(-1)
 
 # 장애물 변수 선언
 obs_x = [screen_w, screen_w * 4 / 3 + random.randint(100, 300), screen_w * 5 / 3 + random.randint(400, 600)]
@@ -132,7 +134,7 @@ def collide(x, y, w, h, x_, y_, w_, h_):
 def game_restart():
     global player_x, player_y, gravity, sliding, jumping, jump_cnt, obs_x, obs_t, game_over, score, mode, hand_up, obs_y, sc_shake_x, sc_shake_y, shake_frame, \
         hand_y, boss_y, boss_x, missile_x, missile_y, missile_fire, attack_frame, laser_shot, boss_attack, game_over_frame, boss_hp, m_boss_df, player_pushed, \
-        spike_up, lightning, credit_y, ending_frame
+        spike_up, lightning, credit_y, ending_frame, lobby_bgm, game_over_sound
     player_x = 100
     player_y = opy
     gravity = 0 
@@ -167,6 +169,8 @@ def game_restart():
     m_boss_bgm.stop()
     f_boss_bgm.stop()
     game_over_sound.stop()
+    lobby_bgm.stop()
+    game_over_sound.stop()
 
 while 1:
     # FPS를 60으로 설정
@@ -200,8 +204,10 @@ while 1:
         if event.type == pygame.KEYDOWN:
             if game_over:
                 if game_over_frame >= 30:
-                    if event.key == pygame.K_ESCAPE:
+                    if event.key == pygame.K_ESCAPE and mode != 'lobby':
                         mode = 'lobby'
+                        game_over_sound.stop()
+                        lobby_bgm.play(-1)
                     else:
                         game_restart()
             else:
