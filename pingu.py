@@ -30,6 +30,7 @@ spike_img = pygame.image.load("resource/spike.png")
 floor_img = [pygame.image.load("resource/floor.png"), pygame.image.load("resource/floor2.png")]
 bg_img = [pygame.image.load(f"resource/bg{i + 1}.png").convert() for i in range(2)]
 gun_img = pygame.image.load(f"resource/gun.png")
+bullet_img = pygame.image.load(f"resource/prablum.png")
 game_over_img = pygame.image.load(f"resource/gameover.png")
 title_img = pygame.image.load(f"resource/title.png")
 gamestart_img = pygame.image.load(f"resource/gamestart.png")
@@ -558,7 +559,7 @@ while 1:
             atk[0] += atk[2][0]
             atk[1] += atk[2][1]
             # 화면에 보여질 위치 설정
-            atk_rect = [atk[0] + sc_shake_x, atk[1] + sc_shake_y, 10, 10]
+            atk_rect = [atk[0] + sc_shake_x, atk[1] + sc_shake_y, 10, 4]
             # 화면 밖으로 나갔다면 remove_t 리스트에 추가
             if atk[0] >= screen_w:
                 remove_t.append(atk)
@@ -568,7 +569,7 @@ while 1:
                     boss_hp -= 1
                 remove_t.append(atk)
             # 플레이어 공격 그리기
-            pygame.draw.rect(screen, (0, 0, 255), atk_rect)
+            screen.blit(bullet_img, atk_rect)
 
         # remove_t에 있는 총알 player_attack에서 삭제
         for r in remove_t:
