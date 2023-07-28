@@ -214,7 +214,7 @@ while 1:
                         jump_cnt -= 1
                         jump_sound.play()
                 # 아래 방향키 눌렀다면 슬라이딩 중으로 바꾸기
-                if event.key == pygame.K_s:
+                if event.key == pygame.K_s and mode != 'ending':
                     sliding = True
             if event.key == pygame.K_a:
                 pressed_key.append("left")
@@ -223,7 +223,7 @@ while 1:
         # 키를 뗀 경우
         if event.type == pygame.KEYUP:
             # 아래 방향키를 뗐다면 슬라이딩 중을 아님으로 바꾸기
-            if not game_over:
+            if not game_over and mode != 'ending':
                 if event.key == pygame.K_s:
                     sliding = False
             if event.key == pygame.K_a:
@@ -716,6 +716,8 @@ while 1:
             pd = font1.render('Producer', True, (155, 155, 155))
             sd = font1.render('Sound Designer', True, (155, 155, 155))
             sh = font1.render('Su Ho Yu', True, (255, 255, 255))
+            t = font1.render('Teacher', True, (155, 155, 155))
+            cw = font1.render('Chan-Woo Roh', True, (255, 255, 255))
             thx = font1.render('Thanks for playing', True, (255, 255, 255))
 
             screen.blit(game_title_text, (screen_w / 2 - 150, screen_h + 100 + credit_y))
@@ -730,6 +732,8 @@ while 1:
             screen.blit(sd, (screen_w / 2 - 50 - sd.get_rect().width, screen_h + 400 + credit_y))
             screen.blit(sh, (screen_w / 2 + 10, screen_h + 400 + credit_y))
             screen.blit(bs, (screen_w / 2 + 10, screen_h + 450 + credit_y))
+            screen.blit(t, (screen_w / 2 - 50 - t.get_rect().width, screen_h + 500 + credit_y))
+            screen.blit(cw, (screen_w / 2 + 10, screen_h + 500 + credit_y))
             thx_y = max(screen_h / 2 - thx.get_rect().height / 2, screen_h + 600 + credit_y)
             screen.blit(thx, (screen_w / 2 - thx.get_rect().width / 2, thx_y))
 
