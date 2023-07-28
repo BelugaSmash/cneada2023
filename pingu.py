@@ -110,6 +110,7 @@ floor_x = 0
 floor_speed = 8
 ending_frame = 0
 mode = "lobby"
+credit_y = 0
 
 pressed_key = []
 
@@ -131,7 +132,7 @@ def collide(x, y, w, h, x_, y_, w_, h_):
 def game_restart():
     global player_x, player_y, gravity, sliding, jumping, jump_cnt, obs_x, obs_t, game_over, score, mode, hand_up, obs_y, sc_shake_x, sc_shake_y, shake_frame, \
         hand_y, boss_y, boss_x, missile_x, missile_y, missile_fire, attack_frame, laser_shot, boss_attack, game_over_frame, boss_hp, m_boss_df, player_pushed, \
-        spike_up, lightning
+        spike_up, lightning, credit_y, ending_frame
     player_x = 100
     player_y = opy
     gravity = 0 
@@ -156,6 +157,8 @@ def game_restart():
     attack_frame = 0
     game_over_frame = 0
     boss_hp = 300
+    credit_y = 0
+    ending_frame = 0
     mode = "normal"
     obs_x = [screen_w, screen_w * 4 / 3 + random.randint(0, 200), screen_w * 5 / 3 + random.randint(200, 400)]
     obs_t = [random.randint(1, 3), random.randint(1, 3), random.randint(1, 3)]
@@ -693,6 +696,43 @@ while 1:
             pygame.draw.rect(screen, (0, 0 , 0), [screen_w - (ef - 150) * (screen_w / 2 - 30) / 60, 0, (ef - 150) * (screen_w / 2 - 30) / 60, screen_h])
             pygame.draw.rect(screen, (0, 0 , 0), [0, 0, screen_w, (ef - 150) * (screen_h - floor_h - player_h) / 60])
             pygame.draw.rect(screen, (0, 0 , 0), [0, screen_h - (ef - 150) * (floor_h) / 60, screen_w, (ef - 150) * (floor_h) / 60])
+
+        if ending_frame >= 250:
+            ef = ending_frame
+            pygame.draw.rect(screen, (0, 0 , 0), [0, 0, (ef - 130) * (screen_w / 2 - 30) / 120, screen_h])
+            pygame.draw.rect(screen, (0, 0 , 0), [screen_w - (ef - 130) * (screen_w / 2 - 30) / 120, 0, (ef - 130) * (screen_w / 2 - 30) / 120, screen_h])
+            pygame.draw.rect(screen, (0, 0 , 0), [0, 0, screen_w, (ef - 130) * (screen_h - floor_h - player_h) / 120])
+            pygame.draw.rect(screen, (0, 0 , 0), [0, screen_h - (ef - 130) * (floor_h) / 120, screen_w, (ef - 130) * (floor_h) / 120])
+
+        if ending_frame >= 300:
+            credit_y -= 2
+            game_title_text = font1.render("Pingu's Adventure II", True, (255, 255, 255))
+            mp = font1.render('Main Programmer', True, (155, 155, 155))
+            ht = font1.render('Hyung Tae Jung', True, (255, 255, 255))
+            gd = font1.render('Graphic Designer', True, (155, 155, 155))
+            jh = font1.render('Jung Hwan Suh', True, (255, 255, 255))
+            ld = font1.render('Level Designer', True, (155, 155, 155))
+            bs = font1.render('Beom Su Kim', True, (255, 255, 255))
+            pd = font1.render('Producer', True, (155, 155, 155))
+            sd = font1.render('Sound Designer', True, (155, 155, 155))
+            sh = font1.render('Su Ho Yu', True, (255, 255, 255))
+            thx = font1.render('Thanks for playing', True, (255, 255, 255))
+
+            screen.blit(game_title_text, (screen_w / 2 - 150, screen_h + 100 + credit_y))
+            screen.blit(mp, (screen_w / 2 - 50 - mp.get_rect().width, screen_h + 200 + credit_y))
+            screen.blit(ht, (screen_w / 2 + 10, screen_h + 200 + credit_y))
+            screen.blit(gd, (screen_w / 2 - 50 - gd.get_rect().width, screen_h + 250 + credit_y))
+            screen.blit(jh, (screen_w / 2 + 10, screen_h + 250 + credit_y))
+            screen.blit(ld, (screen_w / 2 - 50 - ld.get_rect().width, screen_h + 300 + credit_y))
+            screen.blit(bs, (screen_w / 2 + 10, screen_h + 300 + credit_y))
+            screen.blit(pd, (screen_w / 2 - 50 - pd.get_rect().width, screen_h + 350 + credit_y))
+            screen.blit(sh, (screen_w / 2 + 10, screen_h + 350 + credit_y))
+            screen.blit(sd, (screen_w / 2 - 50 - sd.get_rect().width, screen_h + 400 + credit_y))
+            screen.blit(sh, (screen_w / 2 + 10, screen_h + 400 + credit_y))
+            screen.blit(bs, (screen_w / 2 + 10, screen_h + 450 + credit_y))
+            thx_y = max(screen_h / 2 - thx.get_rect().height / 2, screen_h + 600 + credit_y)
+            screen.blit(thx, (screen_w / 2 - thx.get_rect().width / 2, thx_y))
+
     else:
         floor_x -= floor_speed
         screen.blit(bg_img[0], (0, 0))
