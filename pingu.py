@@ -92,7 +92,7 @@ m_boss_score = 5
 m_boss_df = 0
 boss_turn = 100
 boss_attack = 0
-boss_hp = 400
+boss_hp = 300
 boss_p = 50
 attack_frame = 0
 laser_shot = False
@@ -152,7 +152,7 @@ def game_restart():
     shake_frame = 0
     attack_frame = 0
     game_over_frame = 0
-    boss_hp = 400
+    boss_hp = 300
     mode = "normal"
     obs_x = [screen_w, screen_w * 4 / 3 + random.randint(0, 200), screen_w * 5 / 3 + random.randint(200, 400)]
     obs_t = [random.randint(1, 3), random.randint(1, 3), random.randint(1, 3)]
@@ -578,7 +578,7 @@ while 1:
         if mode == 'm boss' and boss_hp <= 0:
             m_boss_bgm.stop()
             m_boss_end_bgm.play()
-            boss_hp = 800
+            boss_hp = 500
             mode = "m boss disappear"
             boss_attack = 0
             attack_frame = 0
@@ -646,13 +646,13 @@ while 1:
         # 보스 체력 표시
         if mode == 'm boss':
             pygame.draw.rect(screen, (200, 200, 200), [screen_w / 2 - 202, 18, 404, 24])
-            pygame.draw.rect(screen, (200, 50, 70), [screen_w / 2 - 200, 20, boss_hp, 20])
+            pygame.draw.rect(screen, (200, 50, 70), [screen_w / 2 - 200, 20, boss_hp / 3 * 4, 20])
             score_color = (200, 50, 70)
             scoretxt = font1.render('Boss', True, score_color)
             screen.blit(scoretxt, (screen_w / 2 - 300, 10))
         if mode == 'f boss':
             pygame.draw.rect(screen, (200, 200, 200), [screen_w / 2 - 202, 18, 404, 24])
-            pygame.draw.rect(screen, (200, 50, 70), [screen_w / 2 - 200, 20, boss_hp / 2, 20])
+            pygame.draw.rect(screen, (200, 50, 70), [screen_w / 2 - 200, 20, boss_hp / 5 * 4, 20])
             score_color = (200, 50, 70)
             scoretxt = font1.render('Boss', True, score_color)
             screen.blit(scoretxt, (screen_w / 2 - 300, 10))
