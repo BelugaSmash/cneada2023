@@ -451,6 +451,11 @@ while 1:
                     elif player_x + player_w >= screen_w:
                         player_x = screen_w - player_w
 
+            if mode == 'ending':
+                hand_up = True
+                hand_y += 10
+                boss_y += 10
+
             if tuna_up:
                 tuna_y -= 1
                 if tuna_y == -10:
@@ -580,6 +585,17 @@ while 1:
             m_boss_end_bgm.play()
             boss_hp = 500
             mode = "m boss disappear"
+            boss_attack = 0
+            attack_frame = 0
+            missile_fire = False
+            missile_x -= 1000
+            missile_y += 2000
+            laser_shot = False
+            boss_turn = 10 * 60
+        
+        if mode == 'f boss' and boss_hp <= 0:
+            f_boss_bgm.stop()
+            mode = 'ending'
             boss_attack = 0
             attack_frame = 0
             missile_fire = False
