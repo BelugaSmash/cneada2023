@@ -73,7 +73,7 @@ m_boss_end_bgm = pygame.mixer.Sound("resource/peaceful.wav")
 f_boss_bgm = pygame.mixer.Sound("resource/f_boss.mp3")
 jump_sound.set_volume(0.35)
 bgm.set_volume(1)
-m_boss_bgm.set_volume(0.4)
+f_boss_bgm.set_volume(0.4)
 bgm.play(-1)
 
 # 장애물 변수 선언
