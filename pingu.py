@@ -29,8 +29,8 @@ tuna_img = pygame.image.load("resource/tuna.png")
 spike_img = pygame.image.load("resource/spike.png")
 floor_img = [pygame.image.load("resource/floor.png"), pygame.image.load("resource/floor2.png")]
 bg_img = [pygame.image.load(f"resource/bg{i + 1}.png").convert() for i in range(2)]
+gun_img = pygame.image.load(f"resource/gun.png")
 game_over_img = pygame.image.load(f"resource/gameover.png")
-# background_img = pygame.image.load(f"resource/background.png")
 title_img = pygame.image.load(f"resource/title.png")
 gamestart_img = pygame.image.load(f"resource/gamestart.png")
 
@@ -151,7 +151,7 @@ def game_restart():
     shake_frame = 0
     attack_frame = 0
     game_over_frame = 0
-    boss_hp = 10
+    boss_hp = 400
     mode = "normal"
     obs_x = [screen_w, screen_w * 4 / 3 + random.randint(0, 200), screen_w * 5 / 3 + random.randint(200, 400)]
     obs_t = [random.randint(1, 3), random.randint(1, 3), random.randint(1, 3)]
@@ -592,9 +592,11 @@ while 1:
         if jumping or not sliding:
             # 점프중이거나 걷는 상태라면 움직이는 모습으로 그리기
             screen.blit(player_walk_img[player_anim % 28], player_rect)
+            screen.blit(gun_img, (player_x + player_w - 20 + sc_shake_x, player_y + player_h / 2 - 10))
         else:
             # 슬라이딩 중이라면 슬라이딩 하는 모습으로 그리기
             screen.blit(player_slide_img, player_rect)
+            screen.blit(gun_img, (player_x + player_w - 10 + sc_shake_x, player_y + player_h / 2))
 
         # 플레이어가 보스에 닿았거나, 미사일, 레이저에 닿았다면 게임 오버 처리
         if (collide(*player_rect, *boss_hitbox) or \
