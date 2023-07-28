@@ -593,11 +593,11 @@ while 1:
         if jumping or not sliding:
             # 점프중이거나 걷는 상태라면 움직이는 모습으로 그리기
             screen.blit(player_walk_img[player_anim % 28], player_rect)
-            screen.blit(gun_img, (player_x + player_w - 20 + sc_shake_x, player_y + player_h / 2 - 10))
+            screen.blit(gun_img, (player_x + player_w - 20 + sc_shake_x, player_y + player_h / 2 - 10 + sc_shake_y))
         else:
             # 슬라이딩 중이라면 슬라이딩 하는 모습으로 그리기
             screen.blit(player_slide_img, player_rect)
-            screen.blit(gun_img, (player_x + player_w - 10 + sc_shake_x, player_y + player_h / 2))
+            screen.blit(gun_img, (player_x + player_w - 10 + sc_shake_x, player_y + player_h / 2 + sc_shake_y))
 
         # 플레이어가 보스에 닿았거나, 미사일, 레이저에 닿았다면 게임 오버 처리
         if (collide(*player_rect, *boss_hitbox) or \
