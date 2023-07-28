@@ -17,6 +17,7 @@ screen = pygame.display.set_mode((screen_w, screen_h))
 # 이미지 변수들 초기화
 cpath = os.path.dirname(__file__)
 player_walk_img = [pygame.image.load(f"resource/pingu_walk/pingu_{str(i).zfill(2)}.png") for i in range(28)]
+pingu_see_img = [pygame.image.load(f"resource/pingu_see.png"), pygame.image.load(f"resource/pingu_see2.png")]
 player_slide_img = pygame.image.load("resource/pingu_slide.png")
 boss_hand = [pygame.image.load("resource/boss_hand_left.png"), pygame.image.load("resource/boss_hand_right.png")]
 boss_img = pygame.image.load("resource/boss.png")
@@ -88,7 +89,7 @@ obs_speed = [8,8,8]
 
 # 스테이지 관련 변수 선언
 score = 0
-m_boss_score = 5
+m_boss_score = 1
 m_boss_df = 0
 boss_turn = 100
 boss_attack = 0
@@ -107,7 +108,9 @@ missile_fire = False
 missile_x, missile_y = 100 + screen_w, screen_h - floor_h - 150 - screen_w / 2
 floor_x = 0
 floor_speed = 8
+ending_frame = 0
 mode = "lobby"
+
 pressed_key = []
 
 # 점수표시 등을 위한 폰트 불러오기
@@ -455,6 +458,10 @@ while 1:
                 hand_up = True
                 hand_y += 10
                 boss_y += 10
+                if player_x + player_w / 2 <= screen_w / 2:
+                    player_x += 4
+                else:
+                    ending_frame += 1
 
             if tuna_up:
                 tuna_y -= 1
@@ -571,7 +578,7 @@ while 1:
             # 보스에 공격이 맞았다면 보스 체력 깍고 remove_t 에 추가
             elif collide(*atk_rect, *boss_hitbox):
                 if boss_attack != 1 and not game_over:
-                    boss_hp -= 1
+                    boss_hp -= 100
                 remove_t.append(atk)
             # 플레이어 공격 그리기
             screen.blit(bullet_img, atk_rect)
@@ -606,7 +613,11 @@ while 1:
 
         # 히트박스 설정(슬라이딩 상태라면) 세로 길이를 반으로
         player_rect = [player_x + sc_shake_x, player_y + (player_h / 2 if sliding and not jumping else 0) + sc_shake_y, player_w, player_h / (2 if sliding and not jumping  else 1)]
-        if jumping or not sliding:
+        if mode == 'ending' and ending_frame >= 120:
+            screen.blit(pingu_see_img[1], player_rect)
+        elif mode == 'ending' and ending_frame >= 60:
+            screen.blit(pingu_see_img[0], player_rect)
+        elif jumping or not sliding:
             # 점프중이거나 걷는 상태라면 움직이는 모습으로 그리기
             screen.blit(player_walk_img[player_anim % 28], player_rect)
             screen.blit(gun_img, (player_x + player_w - 20 + sc_shake_x, player_y + player_h / 2 - 10 + sc_shake_y))
@@ -675,6 +686,13 @@ while 1:
 
         if game_over:
             screen.blit(game_over_img, (0, 0))
+
+        if ending_frame >= 150:
+            ef = min(ending_frame, 210)
+            pygame.draw.rect(screen, (0, 0 , 0), [0, 0, (ef - 150) * (screen_w / 2 - 30) / 60, screen_h])
+            pygame.draw.rect(screen, (0, 0 , 0), [screen_w - (ef - 150) * (screen_w / 2 - 30) / 60, 0, (ef - 150) * (screen_w / 2 - 30) / 60, screen_h])
+            pygame.draw.rect(screen, (0, 0 , 0), [0, 0, screen_w, (ef - 150) * (screen_h - floor_h - player_h) / 60])
+            pygame.draw.rect(screen, (0, 0 , 0), [0, screen_h - (ef - 150) * (floor_h) / 60, screen_w, (ef - 150) * (floor_h) / 60])
     else:
         floor_x -= floor_speed
         screen.blit(bg_img[0], (0, 0))
