@@ -71,6 +71,7 @@ tuna_up = False
 # 소리 관련 변수 설정
 bgm = pygame.mixer.Sound("resource/it's just burning memory.wav")
 lobby_bgm = pygame.mixer.Sound("resource/waltz.mp3")
+ending_bgm = pygame.mixer.Sound("resource/ending_bgm.mp3")
 jump_sound = pygame.mixer.Sound("resource/juuuuuump.wav")
 game_over_sound = pygame.mixer.Sound("resource/121Nootnoot.mp3")
 boom_sound = pygame.mixer.Sound("resource/boom.wav")
@@ -91,7 +92,7 @@ obs_speed = [8,8,8]
 
 # 스테이지 관련 변수 선언
 score = 0
-m_boss_score = 1
+m_boss_score = 32
 m_boss_df = 0
 boss_turn = 100
 boss_attack = 0
@@ -587,7 +588,7 @@ while 1:
             # 보스에 공격이 맞았다면 보스 체력 깍고 remove_t 에 추가
             elif collide(*atk_rect, *boss_hitbox):
                 if boss_attack != 1 and not game_over:
-                    boss_hp -= 100
+                    boss_hp -= 1
                 remove_t.append(atk)
             # 플레이어 공격 그리기
             screen.blit(bullet_img, atk_rect)
@@ -703,6 +704,9 @@ while 1:
             pygame.draw.rect(screen, (0, 0 , 0), [0, 0, screen_w, (ef - 150) * (screen_h - floor_h - player_h) / 60])
             pygame.draw.rect(screen, (0, 0 , 0), [0, screen_h - (ef - 150) * (floor_h) / 60, screen_w, (ef - 150) * (floor_h) / 60])
 
+        if ending_frame == 210:
+            ending_bgm.play()
+        
         if ending_frame >= 250:
             ef = ending_frame
             pygame.draw.rect(screen, (0, 0 , 0), [0, 0, (ef - 130) * (screen_w / 2 - 30) / 120, screen_h])
@@ -711,7 +715,7 @@ while 1:
             pygame.draw.rect(screen, (0, 0 , 0), [0, screen_h - (ef - 130) * (floor_h) / 120, screen_w, (ef - 130) * (floor_h) / 120])
 
         if ending_frame >= 300:
-            credit_y -= 2
+            credit_y -= 1
             game_title_text = font1.render("Pingu's Adventure II", True, (255, 255, 255))
             mp = font1.render('Main Programmer', True, (155, 155, 155))
             ht = font1.render('Hyung Tae Jung', True, (255, 255, 255))
@@ -743,6 +747,9 @@ while 1:
             thx_y = max(screen_h / 2 - thx.get_rect().height / 2, screen_h + 600 + credit_y)
             screen.blit(thx, (screen_w / 2 - thx.get_rect().width / 2, thx_y))
 
+            if credit_y <= -(1200 + screen_h / 2):
+                mode = 'lobby'
+                lobby_bgm.play(-1)
     else:
         floor_x -= floor_speed
         screen.blit(bg_img[0], (0, 0))
