@@ -350,7 +350,7 @@ while 1:
                         attack_frame = 160
                     elif boss_attack == 5:
                         shake_frame = 10
-                        attack_frame = 100
+                        attack_frame = 80
                     if boss_attack == 6:
                         attack_frame = 18*3 + 30*3
                         lightning_x = player_x - 100
@@ -424,7 +424,7 @@ while 1:
                 if attack_frame == 0:
                     boss_attack = 5
                     shake_frame = 10
-                    attack_frame = 100
+                    attack_frame = 80
 
             # 가시 올라오고 내려가게
             if spike_up:
