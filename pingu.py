@@ -94,7 +94,7 @@ obs_speed = [8,8,8]
 
 # 스테이지 관련 변수 선언
 score = 0
-m_boss_score = 1
+m_boss_score = 32
 m_boss_df = 0
 boss_turn = 100
 boss_attack = 0
