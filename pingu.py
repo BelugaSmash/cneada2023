@@ -35,6 +35,7 @@ bullet_img = pygame.image.load(f"resource/prablum.png")
 game_over_img = pygame.image.load(f"resource/gameover.png")
 title_img = pygame.image.load(f"resource/title.png")
 gamestart_img = pygame.image.load(f"resource/gamestart.png")
+pingu_face_img = pygame.image.load(f"resource/pingu_face.png")
 
 floor_h = 200
 
@@ -93,7 +94,7 @@ obs_speed = [8,8,8]
 
 # 스테이지 관련 변수 선언
 score = 0
-m_boss_score = 32
+m_boss_score = 1
 m_boss_df = 0
 boss_turn = 100
 boss_attack = 0
@@ -114,12 +115,14 @@ floor_x = 0
 floor_speed = 8
 ending_frame = 0
 mode = "lobby"
+ending1 = False
 credit_y = 0
 
 pressed_key = []
 
 # 점수표시 등을 위한 폰트 불러오기
 font1 = pygame.font.SysFont('Sans', 30)
+font2 = pygame.font.SysFont('Sans', 45)
 
 # 게임오버 관련 변수
 game_over = False
@@ -136,7 +139,7 @@ def collide(x, y, w, h, x_, y_, w_, h_):
 def game_restart():
     global player_x, player_y, gravity, sliding, jumping, jump_cnt, obs_x, obs_t, game_over, score, mode, hand_up, obs_y, sc_shake_x, sc_shake_y, shake_frame, \
         hand_y, boss_y, boss_x, missile_x, missile_y, missile_fire, attack_frame, laser_shot, boss_attack, game_over_frame, boss_hp, m_boss_df, player_pushed, \
-        spike_up, lightning, credit_y, ending_frame, lobby_bgm, game_over_sound, time
+        spike_up, lightning, credit_y, ending_frame, lobby_bgm, game_over_sound, time, ending1
     player_x = 100
     player_y = opy
     gravity = 0 
@@ -157,6 +160,7 @@ def game_restart():
     laser_shot = False
     spike_up = False
     lightning = False
+    ending1 = False
     sc_shake_x = sc_shake_y = 0
     shake_frame = 0
     attack_frame = 0
@@ -176,18 +180,18 @@ def game_restart():
     game_over_sound.stop()
 
 def sec2hms(sec):
-    n = int(sec)
+    n = sec
     h, m, s = 0, 0, 0
-    s = n % 60
-    m = n // 60
-    h += m // 60
+    s = round(n % 60, 3)
+    m = int(n // 60)
+    h += int(m // 60)
     m %= 60
     return h, m, s
 
 while 1:
     # FPS를 60으로 설정
     clock.tick(60)
-    if clock.get_fps() != 0:
+    if clock.get_fps() != 0 and not game_over and mode != 'ending':
         dt = 1 / clock.get_fps()
         time += dt
 
@@ -241,6 +245,7 @@ while 1:
                 pressed_key.append("left")
             if event.key == pygame.K_d:
                 pressed_key.append("right")
+            
         # 키를 뗀 경우
         if event.type == pygame.KEYUP:
             # 아래 방향키를 뗐다면 슬라이딩 중을 아님으로 바꾸기
@@ -482,10 +487,15 @@ while 1:
                 hand_up = True
                 hand_y += 10
                 boss_y += 10
-                if player_x + player_w / 2 <= screen_w / 2:
-                    player_x += 4
+                if not ending1:
+                    player_x -= 4
+                    if player_x <= 100:
+                        ending1 = True
                 else:
-                    ending_frame += 1
+                    if player_x + player_w / 2 <= screen_w / 2:
+                        player_x += 4
+                    else:
+                        ending_frame += 1
 
             if tuna_up:
                 tuna_y -= 1
@@ -686,18 +696,21 @@ while 1:
                 m_boss_end_bgm.stop()
                 game_over_sound.play()
         
-        # 점수 표시
-        score_color = (0, 0, 0)
+        # 시간 표시
+        time_color = (0, 0, 0)
         # 중간보스일 경우 색을 흰색으로
         if mode == "m boss" or mode == "m boss disappear" or mode == 'f boss appear' or mode == 'f boss':
-            score_color = (255, 255, 255)
-        scoretxt = font1.render('Score: ' + str(score), True, score_color)
-        screen.blit(scoretxt, (10, 10))
-
-        # 시간 표시
+            time_color = (255, 255, 255)
         h, m, s = sec2hms(time)
-        timetxt = font1.render(f'Time {str(h).zfill(2)}:{str(m).zfill(2)}:{str(s).zfill(2)}', True, score_color)
-        screen.blit(timetxt, (10, 50))
+        z, e = '0', ''
+        timetxt = font1.render(f'{str(h).zfill(2)}:{str(m).zfill(2)}:{(z if s < 10 else e) + str(s).zfill(2)}', True, time_color)
+        screen.blit(timetxt, (10, 10))
+
+        if mode == 'normal':
+            pingu_x = screen_w / 2 - 200 + score / m_boss_score * 400
+            pygame.draw.rect(screen, (250, 250, 250), [screen_w / 2 - 202, 18, 404, 24])
+            pygame.draw.rect(screen, (169, 203, 255), [screen_w / 2 - 200, 20, score / m_boss_score * 400, 20])
+            screen.blit(pingu_face_img, (pingu_x - player_w / 2, 18 + 24 / 2 - player_h / 2))
 
         # 보스 체력 표시
         if mode == 'm boss':
@@ -706,6 +719,7 @@ while 1:
             score_color = (200, 50, 70)
             scoretxt = font1.render('Boss', True, score_color)
             screen.blit(scoretxt, (screen_w / 2 - 300, 10))
+        
         if mode == 'f boss':
             pygame.draw.rect(screen, (200, 200, 200), [screen_w / 2 - 202, 18, 404, 24])
             pygame.draw.rect(screen, (200, 50, 70), [screen_w / 2 - 200, 20, boss_hp / 5 * 4, 20])
@@ -747,7 +761,11 @@ while 1:
             sh = font1.render('Su Ho Yu', True, (255, 255, 255))
             t = font1.render('Teacher', True, (155, 155, 155))
             cw = font1.render('Chan-Woo Roh', True, (255, 255, 255))
-            thx = font1.render('Thanks for playing', True, (255, 255, 255))
+            thx = font2.render('Thanks for playing', True, (255, 255, 255))
+
+            h, m, s = sec2hms(time)
+            z, e = '0', ''
+            timetxt = font1.render(f'{str(h).zfill(2)}:{str(m).zfill(2)}:{(z if s < 10 else e) + str(s).zfill(2)}', True, (255, 255, 255))
 
             screen.blit(game_title_text, (screen_w / 2 - 150, screen_h + 100 + credit_y))
             screen.blit(mp, (screen_w / 2 - 50 - mp.get_rect().width, screen_h + 200 + credit_y))
@@ -765,6 +783,7 @@ while 1:
             screen.blit(cw, (screen_w / 2 + 10, screen_h + 500 + credit_y))
             thx_y = max(screen_h / 2 - thx.get_rect().height / 2, screen_h + 600 + credit_y)
             screen.blit(thx, (screen_w / 2 - thx.get_rect().width / 2, thx_y))
+            screen.blit(timetxt, (screen_w / 2 - timetxt.get_rect().width / 2, thx_y + 50))
 
             if credit_y <= -(1200 + screen_h / 2):
                 mode = 'lobby'
