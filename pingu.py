@@ -59,6 +59,7 @@ sliding = False
 jumping = False
 jump_cnt = 0
 bullet_speed = 20
+time = 0
 
 # 보스 관련 변수 선언
 boss_hand_x = [830, 1000]
@@ -135,7 +136,7 @@ def collide(x, y, w, h, x_, y_, w_, h_):
 def game_restart():
     global player_x, player_y, gravity, sliding, jumping, jump_cnt, obs_x, obs_t, game_over, score, mode, hand_up, obs_y, sc_shake_x, sc_shake_y, shake_frame, \
         hand_y, boss_y, boss_x, missile_x, missile_y, missile_fire, attack_frame, laser_shot, boss_attack, game_over_frame, boss_hp, m_boss_df, player_pushed, \
-        spike_up, lightning, credit_y, ending_frame, lobby_bgm, game_over_sound
+        spike_up, lightning, credit_y, ending_frame, lobby_bgm, game_over_sound, time
     player_x = 100
     player_y = opy
     gravity = 0 
@@ -144,6 +145,7 @@ def game_restart():
     hand_up = True
     player_pushed = False
     obs_y = 0
+    time = 0
     jump_cnt = 2
     score = 0
     hand_y = screen_h - floor_h - 34 + 300
@@ -173,9 +175,21 @@ def game_restart():
     lobby_bgm.stop()
     game_over_sound.stop()
 
+def sec2hms(sec):
+    n = int(sec)
+    h, m, s = 0, 0, 0
+    s = n % 60
+    m = n // 60
+    h += m // 60
+    m %= 60
+    return h, m, s
+
 while 1:
     # FPS를 60으로 설정
     clock.tick(60)
+    if clock.get_fps() != 0:
+        dt = 1 / clock.get_fps()
+        time += dt
 
     # 파이게임 기본 코드
     for event in pygame.event.get():
@@ -680,6 +694,11 @@ while 1:
         scoretxt = font1.render('Score: ' + str(score), True, score_color)
         screen.blit(scoretxt, (10, 10))
 
+        # 시간 표시
+        h, m, s = sec2hms(time)
+        timetxt = font1.render(f'Time {str(h).zfill(2)}:{str(m).zfill(2)}:{str(s).zfill(2)}', True, score_color)
+        screen.blit(timetxt, (10, 50))
+
         # 보스 체력 표시
         if mode == 'm boss':
             pygame.draw.rect(screen, (200, 200, 200), [screen_w / 2 - 202, 18, 404, 24])
@@ -733,7 +752,7 @@ while 1:
             screen.blit(game_title_text, (screen_w / 2 - 150, screen_h + 100 + credit_y))
             screen.blit(mp, (screen_w / 2 - 50 - mp.get_rect().width, screen_h + 200 + credit_y))
             screen.blit(ht, (screen_w / 2 + 10, screen_h + 200 + credit_y))
-            screen.blit(gd, (screen_w / 2 - 50 - gd.get_rect().width, screen_h + 250 + credit_y))
+            screen.blit(gd, (screen_w / 2 - 50 - gd.get_rect().width, screen_h + 250 + credit_y)    )
             screen.blit(jh, (screen_w / 2 + 10, screen_h + 250 + credit_y))
             screen.blit(ld, (screen_w / 2 - 50 - ld.get_rect().width, screen_h + 300 + credit_y))
             screen.blit(bs, (screen_w / 2 + 10, screen_h + 300 + credit_y))
