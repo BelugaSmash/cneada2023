@@ -36,6 +36,7 @@ game_over_img = pygame.image.load(f"resource/gameover.png")
 title_img = pygame.image.load(f"resource/title.png")
 gamestart_img = pygame.image.load(f"resource/gamestart.png")
 pingu_face_img = pygame.image.load(f"resource/pingu_face.png")
+story_img = [pygame.image.load(f"resource/story/{i + 1}.png").convert() for i in range(5)]
 
 floor_h = 200
 
@@ -61,6 +62,8 @@ jumping = False
 jump_cnt = 0
 bullet_speed = 20
 time = 0
+
+story_y = 0
 
 # 보스 관련 변수 선언
 boss_hand_x = [830, 1000]
@@ -114,7 +117,7 @@ missile_x, missile_y = 100 + screen_w, screen_h - floor_h - 150 - screen_w / 2
 floor_x = 0
 floor_speed = 8
 ending_frame = 0
-mode = "lobby"
+mode = "story"
 ending1 = False
 credit_y = 0
 
@@ -257,7 +260,7 @@ while 1:
             if event.key == pygame.K_d:
                 pressed_key.remove("right")
     
-    if mode != 'lobby':
+    if mode != 'lobby' and mode != 'story':
         # 게임 오버가 아니라면
         if not game_over:
             # 플레이어 움직이기
@@ -770,7 +773,7 @@ while 1:
             screen.blit(game_title_text, (screen_w / 2 - 150, screen_h + 100 + credit_y))
             screen.blit(mp, (screen_w / 2 - 50 - mp.get_rect().width, screen_h + 200 + credit_y))
             screen.blit(ht, (screen_w / 2 + 10, screen_h + 200 + credit_y))
-            screen.blit(gd, (screen_w / 2 - 50 - gd.get_rect().width, screen_h + 250 + credit_y)    )
+            screen.blit(gd, (screen_w / 2 - 50 - gd.get_rect().width, screen_h + 250 + credit_y))
             screen.blit(jh, (screen_w / 2 + 10, screen_h + 250 + credit_y))
             screen.blit(ld, (screen_w / 2 - 50 - ld.get_rect().width, screen_h + 300 + credit_y))
             screen.blit(bs, (screen_w / 2 + 10, screen_h + 300 + credit_y))
@@ -789,12 +792,19 @@ while 1:
                 mode = 'lobby'
                 lobby_bgm.play(-1)
     else:
-        floor_x -= floor_speed
-        screen.blit(bg_img[0], (0, 0))
-        screen.blit(floor_img[0], (floor_x % (screen_w * 2) - screen_w + sc_shake_x, screen_h - floor_h - 50 + sc_shake_y))
-        screen.blit(floor_img[0], (((floor_x + screen_w) % (screen_w * 2) - screen_w + sc_shake_x, screen_h - floor_h - 50 + sc_shake_y)))
-        screen.blit(title_img, (screen_w / 2 - 320, 20))
-        screen.blit(gamestart_img, (screen_w / 2 - 150, 400))
+        if mode == 'story':
+            story_y += 2
+            for i in range(5):
+                screen.blit(story_img[i], (0, 720 * i - story_y))
+            if story_y >= 720 * 5:
+                mode = 'lobby'
+        else:
+            floor_x -= floor_speed
+            screen.blit(bg_img[0], (0, 0))
+            screen.blit(floor_img[0], (floor_x % (screen_w * 2) - screen_w + sc_shake_x, screen_h - floor_h - 50 + sc_shake_y))
+            screen.blit(floor_img[0], (((floor_x + screen_w) % (screen_w * 2) - screen_w + sc_shake_x, screen_h - floor_h - 50 + sc_shake_y)))
+            screen.blit(title_img, (screen_w / 2 - 320, 20))
+            screen.blit(gamestart_img, (screen_w / 2 - 150, 400))
 
     # 화면 업데이트
     pygame.display.update()
